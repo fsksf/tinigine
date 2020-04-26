@@ -37,3 +37,9 @@ class AbstractEventSource:
 
     def events(self):
         raise NotImplementedError
+
+
+class AbstractMetrics:
+
+    def get_result(self):
+        raise NotImplementedError

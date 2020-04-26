@@ -8,6 +8,7 @@
 from collections import defaultdict
 from functools import wraps
 
+
 class EventBus:
 
     def __init__(self):
