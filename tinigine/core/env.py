@@ -8,6 +8,7 @@
 from tinigine.core.event_bus import EventBus
 from tinigine.utils.logger import get_logger
 
+
 class Environment:
     def __init__(self, params):
         self.params = params

@@ -17,7 +17,6 @@ DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 
 def get_logger(datetime_func=datetime.datetime.now, log_type='', level='INFO'):
 
-
     def logger_formatter(record, handler):
         if level == 'DEBUG':
             prefix = f'{log_type}:{str(record.lineno)}'
