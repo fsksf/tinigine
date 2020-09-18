@@ -39,3 +39,5 @@ def get_logger(datetime_func=datetime.datetime.now, log_type='', level='INFO'):
     logger.level = level
     return logger
 
+
+sys_logger = get_logger()
