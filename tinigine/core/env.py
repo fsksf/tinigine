@@ -25,3 +25,6 @@ class Environment:
 
     def set_portfolio_manager(self, portfolio_manager):
         self.portfolio_manager = portfolio_manager
+
+    def set_data_proxy(self, data_proxy):
+        self.data_proxy = data_proxy
