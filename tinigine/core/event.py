@@ -18,8 +18,8 @@ class Event:
 
 class EventType(Enum):
     INITIALIZE = 'initialize'
+    SUBSCRIBE = 'subscribe'
     BEFORE_TRADING = 'before_trading'
     AFTER_TRADING = 'after_trading'
-    BAR = 'bar'
     DATA = 'data'
 
