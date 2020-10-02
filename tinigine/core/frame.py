@@ -43,14 +43,19 @@ class Frame:
     def append(self, other):
         raise NotImplementedError
 
+    def ix(self, index):
+        return dict(zip(self.columns, self.arr[index]))
+
+    def i_of(self, ):
+
     def roll_calc(self, window, func):
         pass
 
 
 class SFrame:
 
-    def __init__(self, frame_list=None):
-        self.frame_dict = frame_list if frame_list else {}
+    def __init__(self, frame_dict=None):
+        self.frame_dict = frame_dict if frame_dict else {}
         self.index = None
         self.columns = None
 
@@ -92,3 +97,30 @@ class SFrame:
         :return:
         """
         pass
+
+    def ix(self, index):
+        out = {}
+        for frm in self.frame_dict.values():
+            out[frm.name] = frm.ix(index)
+        return out
+
+    def i_of(self, o, side='gte'):
+        if len(self.index) == 0:
+            raise ValueError
+        if side == 'gte':
+            if o > self.index[-1]:
+                raise ValueError(f'{o} is grate than index max')
+            for i, item in list(enumerate(self.index))[::-1]
+                if item < o:
+                    return i+1
+
+        elif side == 'lte':
+            if o < self.index[0]:
+                raise ValueError(f'{o} is lt than index min')
+            for i, item in list(enumerate(self.index))[::-1]
+                if item > o:
+                    return i-1
+
+
+    def __len__(self):
+        return len(self.index)

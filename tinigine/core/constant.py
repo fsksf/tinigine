@@ -41,3 +41,9 @@ class Market(Enum):
     HK = 'HK'
     US = 'US'
 
+
+FREQ_FORMAT_DICT = {
+    Freq.DAILY: '%Y-%m-%d',
+    Freq.MINUTE: '%Y-%m-%d %H:%M:%S'
+}
+
