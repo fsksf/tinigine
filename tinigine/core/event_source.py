@@ -24,6 +24,7 @@ class EventSource(AbstractEventSource):
         env = self._env
         event_bus = env.event_bus
         start_date = self._env.params.start
-        for data in DataWalker(self._env.data_proxy, start_date)
+        for data in DataWalker(self._env.data_proxy, start_date):
+            yield data
 
 
