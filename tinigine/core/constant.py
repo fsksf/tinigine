@@ -34,6 +34,7 @@ class Currency(Enum):
     USD = 'USD'
     HKD = 'HKD'
     CNH = 'CNH'
+    CNY = 'CNY'
 
 
 class Market(Enum):

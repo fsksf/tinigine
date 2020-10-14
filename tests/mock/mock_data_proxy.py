@@ -4,17 +4,19 @@
 
 @since: 2020/8/27 8:16 AM
 """
+import os
 import pandas as pd
 from tinigine.interface import AbstractDataProxy
 from tinigine.core.contract import StockContract
 from tinigine.core.frame import Frame, SFrame
+from tests import TESTS_DIR
 
 
 class MockDataProxy(AbstractDataProxy):
 
     def __init__(self):
         self._cache = None
-        self._csv_path = '../data/quote/cn_daily_stock_quote.csv'
+        self._csv_path = os.path.join(TESTS_DIR, 'data/quote/cn_daily_stock_quote.csv')
         quote_data = pd.read_csv(self._csv_path)
         self._symbols = list(set(quote_data['symbol']))
         self._calendar = sorted(set(quote_data['timestamp']))

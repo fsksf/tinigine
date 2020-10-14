@@ -18,15 +18,31 @@ class AbstractModule:
 class AbstractDataProxy:
 
     def on_subscribe(self, event):
+        """
+        订阅
+        :param event:
+        :return:
+        """
         raise NotImplementedError
 
     def get_calendar(self):
+        """
+        获取交易日历
+        :return:
+        """
         raise NotImplementedError
 
     def get_contract_info(self, symbol):
         raise NotImplementedError
 
     def get_symbols(self):
+        raise NotImplementedError
+
+    def get_datetime(self):
+        """
+        获取策略运行的当前时间
+        :return: dt
+        """
         raise NotImplementedError
 
 

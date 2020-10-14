@@ -11,9 +11,9 @@ from tinigine.core.params import Params
 from tinigine.utils.config import ConfigManager
 from tinigine.core.constant import Freq
 from .mock_data_proxy import MockDataProxy
+from tests import TESTS_DIR
 
-CURRENT_DIR = os.path.dirname(__file__)
-MOCK_TINIGINE_PATH = os.path.join(os.path.dirname(CURRENT_DIR), '.tinigine')
+MOCK_TINIGINE_PATH = os.path.join(TESTS_DIR, '.tinigine')
 
 os.environ[ConfigManager.TINIGINE_PATH] = MOCK_TINIGINE_PATH
 

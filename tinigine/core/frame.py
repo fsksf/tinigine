@@ -20,19 +20,19 @@ class Frame:
         self._name = name
         self._columns = columns
 
-    @property.getter
+    @property
     def columns(self):
         return self._columns
 
-    @property.getter
+    @property
     def name(self):
         return self._name
 
-    @property.getter
+    @property
     def index(self):
         return self._index
 
-    @property.getter
+    @property
     def arr(self):
         return self._arr
 
@@ -47,6 +47,7 @@ class Frame:
         return dict(zip(self.columns, self.arr[index]))
 
     def i_of(self, ):
+        pass
 
     def roll_calc(self, window, func):
         pass
@@ -110,17 +111,16 @@ class SFrame:
         if side == 'gte':
             if o > self.index[-1]:
                 raise ValueError(f'{o} is grate than index max')
-            for i, item in list(enumerate(self.index))[::-1]
+            for i, item in list(enumerate(self.index))[::-1]:
                 if item < o:
                     return i+1
 
         elif side == 'lte':
             if o < self.index[0]:
                 raise ValueError(f'{o} is lt than index min')
-            for i, item in list(enumerate(self.index))[::-1]
+            for i, item in list(enumerate(self.index))[::-1]:
                 if item > o:
                     return i-1
-
 
     def __len__(self):
         return len(self.index)
