@@ -4,7 +4,7 @@
 
 @since: 2020/9/19 11:59 AM
 """
-
+import tests.test_strategy
 from tinigine.interface import AbstractEventSource
 from tinigine.core.env import Environment
 from tinigine.core.event import EventType
@@ -23,7 +23,7 @@ class EventSource(AbstractEventSource):
     def data_events(self):
         env = self._env
         event_bus = env.event_bus
-        start_date = self._env.params.start
+        start_date = tests.test_strategy.params.start
         for data in DataWalker(self._env.data_proxy, start_date):
             yield data
 
