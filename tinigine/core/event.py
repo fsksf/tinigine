@@ -17,9 +17,13 @@ class Event:
 
 
 class EventType(Enum):
-    INITIALIZE = 'initialize'
-    SUBSCRIBE = 'subscribe'
-    BEFORE_TRADING = 'before_trading'
-    AFTER_TRADING = 'after_trading'
-    DATA = 'data'
+    INITIALIZE = 'INITIALIZE'
+    SUBSCRIBE = 'SUBSCRIBE'
+    BEFORE_TRADING = 'BEFORE_TRADING'
+    AFTER_TRADING = 'AFTER_TRADING'
+    BAR = 'BAR'
+    TICK = 'TICK'
+    ORDER_CHANGE = 'ORDER_CHANGE'
+    USER_EVENT = 'USER_EVENT'
+    QUIT = 'QUIT'
 

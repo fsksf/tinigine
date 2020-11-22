@@ -7,3 +7,7 @@
 import os
 
 TESTS_DIR = os.path.dirname(__file__)
+
+MOCK_TINIGINE_PATH = os.path.join(TESTS_DIR, '.tinigine')
+
+os.environ[ConfigManager.TINIGINE_PATH] = MOCK_TINIGINE_PATH
