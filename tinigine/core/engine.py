@@ -21,7 +21,7 @@ class Engine:
     def run(self):
         event_bus = self._env.event_bus
         event_source = self._env.event_source
-
+        self.initialize()
         for event in event_source.events():
             event_bus.emit(event)
 

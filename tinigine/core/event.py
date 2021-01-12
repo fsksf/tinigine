@@ -9,7 +9,7 @@ from enum import Enum
 
 class Event:
     def __init__(self, event_type, **kwargs):
-        self.type = event_type
+        self.event_type = event_type
         self.__dict__.update(kwargs)
 
     def __str__(self):

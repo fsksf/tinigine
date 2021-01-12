@@ -4,6 +4,7 @@
 
 @since: 2020-04-25 17:12
 """
+from collections import defaultdict
 
 
 class AbstractModule:
@@ -16,6 +17,12 @@ class AbstractModule:
 
 
 class AbstractDataProxy:
+
+    def __init__(self, env):
+        self._env = env
+
+    def get_sf(self):
+        raise NotImplementedError
 
     def on_subscribe(self, event):
         """
@@ -45,6 +52,9 @@ class AbstractDataProxy:
         """
         raise NotImplementedError
 
+    def subscribe(self, symbols, before_bar_count=1):
+        raise NotImplementedError
+
 
 class AbstractEventSource:
 
@@ -59,3 +69,40 @@ class AbstractMetrics:
 
     def get_result(self):
         raise NotImplementedError
+
+
+class AbstractEventBus:
+
+    def __init__(self):
+        self._events_register_dict = defaultdict(list)
+
+    def add_event(self, func, event_type):
+        self._events_register_dict[event_type].append(func)
+
+    def get_event_funcs(self, event_type):
+        return self._events_register_dict[event_type]
+
+    def emit(self, event, *args, **kwargs):
+        pass
+
+
+class AbstractEnv:
+    def __init__(self, params):
+        self.params = params
+        self.data_proxy: AbstractDataProxy = AbstractDataProxy(self)
+        self.event_source: AbstractEventSource = AbstractEventSource(self)
+        self.event_bus: AbstractEventBus = AbstractEventBus()
+        self.portfolio_manager = None
+        self.broker = None
+        self.metrics = None
+        self.logger = None
+        self.strategy = None
+
+    def set_event_source(self, event_source):
+        self.event_source = event_source
+
+    def set_portfolio_manager(self, portfolio_manager):
+        self.portfolio_manager = portfolio_manager
+
+    def set_data_proxy(self, data_proxy):
+        self.data_proxy = data_proxy
