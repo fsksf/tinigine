@@ -7,21 +7,26 @@
 
 from collections import defaultdict
 from functools import wraps
+from tinigine.interface import AbstractEventBus
 
 
-class EventBus:
+class EventBus(AbstractEventBus):
 
     def __init__(self):
         self._events_register_dict = defaultdict(list)
 
-    def add_event(self, func, event):
-        self._events_register_dict[event].append(func)
+    def add_event(self, func, event_type):
+        self._events_register_dict[event_type].append(func)
 
-    def get_event_funcs(self, event):
-        for func in self._events_register_dict[event]:
-            yield func
+    def get_event_funcs(self, event_type):
+        return self._events_register_dict[event_type]
 
     def on(self, event):
+        """
+        给某个func订阅事件
+        :param event:
+        :return:
+        """
         def outer(func):
             self.add_event(func, event)
 
@@ -32,7 +37,7 @@ class EventBus:
         return outer
 
     def emit(self, event, *args, **kwargs):
-        for func in self.get_event_funcs(event):
+        for func in self.get_event_funcs(event.event_type):
             func(event, *args, **kwargs)
 
     def emit_after(self, event):

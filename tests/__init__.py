@@ -5,6 +5,7 @@
 @since: 2020/9/14 9:55 PM
 """
 import os
+from tinigine.utils.config import ConfigManager
 
 TESTS_DIR = os.path.dirname(__file__)
 

@@ -5,6 +5,11 @@
 @since: 2020/9/18 6:07 PM
 """
 
+from functools import wraps
+import tinigine.api
+import tinigine.core.event_bus
+from tinigine.utils.local_instance import get_instance
+
 
 def ensure_directory(path):
     """
@@ -33,3 +38,22 @@ def merge_dict(this, other):
         else:
             this[key] = value
     return this
+
+
+def api_method(instance_name='Strategy'):
+    def outer_wp(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            algo_instance = get_instance(name=instance_name)
+            return getattr(algo_instance, f.__name__)(*args, **kwargs)
+        setattr(tinigine.api, f.__name__, wrapped)
+        tinigine.api.__all__.append(f.__name__)
+        f.is_api_method = True
+        return f
+    return outer_wp
+
+
+def add_api(func):
+    setattr(tinigine.api, func.__name__, func)
+    tinigine.api.__all__.append(func.__name__)
+    return func
