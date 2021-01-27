@@ -90,6 +90,9 @@ class SFrame:
         data.reset_index(inplace=True)
         return data
 
+    def history(self, before_bar_count):
+        pass
+
     def roll_calc(self, window, func):
         """
         进行滚动计算
@@ -114,6 +117,8 @@ class SFrame:
             for i, item in list(enumerate(self.index))[::-1]:
                 if item < o:
                     return i+1
+                elif item == o:
+                    return i
 
         elif side == 'lte':
             if o < self.index[0]:
@@ -121,6 +126,9 @@ class SFrame:
             for i, item in list(enumerate(self.index))[::-1]:
                 if item > o:
                     return i-1
+                elif item == 0:
+                    return i
+        return None
 
     def __len__(self):
         return len(self.index)

@@ -9,7 +9,8 @@ from tinigine.interface import AbstractEnv, AbstractEventBus
 from .event import EventType, Event
 from tinigine.utils.logger import get_logger
 from tinigine.utils.local_instance import set_instance
-from tinigine.utils.utils import api_method
+from tinigine.utils.utils import local_method, add_api_method
+from tinigine.core.context import Context
 
 
 class Strategy:
@@ -26,15 +27,16 @@ class Strategy:
         self._on_tick = None
         self.logger = self._env.logger
         self._algo_text = algo_text
+        self._context = Context()
 
         self._user_space = dict()
         self.add_api('log', get_logger())
         self.set_up()
 
     def set_up(self):
+        add_api_method(self.subscribe)
         self.init_algo()
         self.parse_strategy()
-        set_instance(self.__class__.__name__, self)
 
     def tear_down(self):
         pass
@@ -51,6 +53,18 @@ class Strategy:
         if user_quit:
             user_quit()
 
+    def initialize(self, event):
+        self._initialize(self._context)
+
+    def on_bar(self, event):
+        self._on_bar(self._context, event.data)
+
+    def before_trade(self, event):
+        self._before_trade(self._context, event.data)
+
+    def on_order_change(self, event):
+        self._on_order_changed(self._context, event.order)
+
     def parse_strategy(self):
         self._initialize = self._user_space.get('initialize', None)
         self._before_trade = self._user_space.get('before_trade', None)
@@ -61,17 +75,12 @@ class Strategy:
 
         # ------- add stand event -------
         if self._initialize:
-            self._event_bus.add_event(self._initialize, event_type=EventType.INITIALIZE)
-        if self._subscribe:
-            self._event_bus.add_event(self._env.data_proxy.on_subscribe, event_type=EventType.SUBSCRIBE)
+            self._event_bus.add_event(self.initialize, event_type=EventType.INITIALIZE)
         if self._before_trade:
-            self._event_bus.add_event(self._before_trade, event_type=EventType.BEFORE_TRADING)
+            self._event_bus.add_event(self.before_trade, event_type=EventType.BEFORE_TRADING)
         if self._on_bar:
-            self._event_bus.add_event(self._on_bar, event_type=EventType.BAR)
-        if self._on_tick:
-            self._event_bus.add_event(self._on_tick, event_type=EventType.TICK)
-        if self._on_order_changed:
-            self._event_bus.add_event(self._on_order_changed, event_type=EventType.ORDER_CHANGE)
+            self._event_bus.add_event(self.on_bar, event_type=EventType.BAR)
+            self._event_bus.add_event(self.on_order_change, event_type=EventType.ORDER_CHANGE)
         if self._on_event:
             self._event_bus.add_event(self._on_event, event_type=EventType.USER_EVENT)
 
@@ -79,6 +88,5 @@ class Strategy:
 
         # ------- emit event --------
 
-    @api_method(instance_name='Strategy')
     def subscribe(self, symbols, before_bar_count=1):
         self._env.data_proxy.subscribe(symbols=symbols, before_bar_count=before_bar_count)

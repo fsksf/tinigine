@@ -19,7 +19,12 @@ strategy_str = """
 from tinigine.api import *
 
 def initialize(context):
+    print(context)
     subscribe('000001', 10)
+    
+def on_bar(context, data):
+    print(context)
+    print(data.current())
 
 """
 

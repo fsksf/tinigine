@@ -13,7 +13,7 @@ def before_trade(context):
     pass
 
 
-def on_bar(context):
+def on_bar(context, data):
     pass
 
 

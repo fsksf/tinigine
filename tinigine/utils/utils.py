@@ -9,6 +9,9 @@ from functools import wraps
 import tinigine.api
 import tinigine.core.event_bus
 from tinigine.utils.local_instance import get_instance
+from tinigine.utils.local_instance import InstanceApiDecorator
+
+instance_api_decorator = InstanceApiDecorator
 
 
 def ensure_directory(path):
@@ -40,7 +43,7 @@ def merge_dict(this, other):
     return this
 
 
-def api_method(instance_name='Strategy'):
+def local_method(instance_name='Strategy'):
     def outer_wp(f):
         @wraps(f)
         def wrapped(*args, **kwargs):
@@ -53,7 +56,16 @@ def api_method(instance_name='Strategy'):
     return outer_wp
 
 
-def add_api(func):
-    setattr(tinigine.api, func.__name__, func)
+def add_api_method(func):
+    """
+    添加func到用户环境
+    :param func:
+    :return:
+    """
+    def wrapped(*args, **kwargs):
+        return func(*args, **kwargs)
+
     tinigine.api.__all__.append(func.__name__)
-    return func
+    setattr(tinigine.api, func.__name__, wrapped)
+    wrapped.is_api_method = True
+    return wrapped
