@@ -6,7 +6,7 @@
 """
 import os
 import pandas as pd
-from tinigine.utils.utils import api_method
+from tinigine.utils.utils import local_method, instance_api_decorator
 from tinigine.interface import AbstractDataProxy
 from tinigine.core.contract import StockContract
 from tinigine.core.event import Event, EventType

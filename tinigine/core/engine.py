@@ -24,10 +24,9 @@ class Engine:
         self.initialize()
         for event in event_source.events():
             event_bus.emit(event)
-
+        if self._env.metrics:
+            self._env.metrics.get_result()
         self.tear_down()
-
-        return self._env.metrics.get_result()
 
     def set_up(self):
         for mod in self._mod_list:
