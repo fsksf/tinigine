@@ -1,0 +1,4 @@
+
+
+class TErrors(Exception):
+    pass

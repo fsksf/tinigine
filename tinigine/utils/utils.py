@@ -4,7 +4,8 @@
 
 @since: 2020/9/18 6:07 PM
 """
-
+import os
+from errno import EEXIST
 from functools import wraps
 import tinigine.api
 import tinigine.core.event_bus
@@ -33,6 +34,8 @@ def merge_dict(this, other):
     :param other: merge from
     :return:
     """
+    if not other:
+        return this
     for key, value in other.items():
         if isinstance(value, dict):
             # get node or create one

@@ -9,6 +9,7 @@ from tinigine.core.params import Params
 from tinigine.core.event_bus import EventBus
 from tinigine.core.strategy import Strategy
 from tinigine.utils.logger import get_logger
+from tinigine.config import conf
 
 
 class Environment(AbstractEnv):
@@ -22,6 +23,7 @@ class Environment(AbstractEnv):
         self.metrics = None
         self.logger = get_logger(log_type='system', level=params.log_level)
         self.strategy = Strategy(env=self, algo_text=params.algo_text, log_level=params.log_level)
+        self.conf = conf
 
     def set_event_source(self, event_source):
         self.event_source = event_source

@@ -25,6 +25,7 @@ def initialize(context):
 def on_bar(context, data):
     print(context)
     print(data.current())
+    print(data.history(5))
 
 """
 
