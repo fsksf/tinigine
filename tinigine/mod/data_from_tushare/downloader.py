@@ -12,7 +12,7 @@ import pandas as pd
 from tinigine.mod.data_from_tushare import mod_conf
 
 
-tushare.set_token(mod_conf['token'])
+tushare.set_token(mod_conf.get_config()['token'])
 
 ts_pro = tushare.pro_api()
 
