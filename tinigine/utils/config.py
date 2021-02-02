@@ -30,7 +30,12 @@ class ConfigManager:
         self._config_obj = self.merge_all()
 
     @staticmethod
-    def get_mod_default_dir(mod_name):
+    def get_mod_default_dir(mod_name='system'):
+        """
+        获取engine or mod 目录
+        :param mod_name:
+        :return:
+        """
         if mod_name == 'system':
             return ROOT_PATH
         return os.path.join(MOD_PATH, mod_name)
@@ -50,7 +55,10 @@ class ConfigManager:
         """
         out = {}
         default_config_obj = self.read_yml(self._default_config_path)
-        custom_config_obj = self.read_yml(self._custom_config_path)
+        try:
+            custom_config_obj = self.read_yml(self._custom_config_path)
+        except FileNotFoundError:
+            custom_config_obj = {}
         out = merge_dict(out, default_config_obj)
         return merge_dict(out, custom_config_obj)
 
@@ -89,3 +97,14 @@ class ConfigManager:
         shutil.copy(self._default_config_path, self._custom_config_path)
         sys_logger.info(f"generate config file: {self._custom_config_path}")
         return self._custom_config_path
+
+    def get_version(self):
+        """
+        获取engine or mod 版本
+        :return:
+        """
+        try:
+            with open(os.path.join(self.get_mod_custom_dir(self._mod_name), 'VERSION.txt'), 'r') as f:
+                return f.read()
+        except (FileExistsError, FileNotFoundError):
+            return '0.0.0'

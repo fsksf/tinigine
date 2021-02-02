@@ -23,7 +23,7 @@ def get_logger(datetime_func=datetime.datetime.now, log_type='', level='INFO'):
         else:
             prefix = f'{log_type}:{record.module}:{str(record.lineno)}'
 
-        log_str = '[{dt}] {level}: [{prefix}]: {msg}'.format(
+        log_str = '{dt} {level}: [{prefix}]: {msg}'.format(
             dt=datetime_func().strftime(DATETIME_FORMAT),
             level=record.level_name,
             prefix=prefix,
@@ -31,12 +31,13 @@ def get_logger(datetime_func=datetime.datetime.now, log_type='', level='INFO'):
         )
 
         return log_str
-
-    logger = logbook.Logger('[system] ')
+    if level == 'DEBUG':
+        logger = logbook.Logger('[system] ', level=logbook.DEBUG)
+    else:
+        logger = logbook.Logger('[system] ', level=logbook.INFO)
     handler = StreamHandler(sys.stdout)
     handler.formatter = logger_formatter
     logger.handlers = [handler, ]
-    logger.level = level
     return logger
 
 
