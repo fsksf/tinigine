@@ -10,15 +10,27 @@ def load():
     mod_instance = DataFromTushare()
     return mod_instance
 
+
 @add_cmd
 @click.command()
 @click.help_option('-h', '--help')
 @click.option('-m', '--market', default='CN', help='市场')
 @click.option('-f', '--freq', default='all', help='要更新的数据， {daily: 1d, minute: 1m, all: all}')
 @click.pass_context
-def quote_init(ctx):
+def dft_quote_init(ctx):
+    """
+    初始化行情数据
+    """
     pass
 
 
-from tinigine import CMD_LIST
-print('init command', CMD_LIST)
+@add_cmd
+@click.command()
+@click.help_option('-h', '--help')
+@click.option('-d', '--directory', type=click.Path(), default=None)
+def dft_gen_config(directory):
+    """
+    data_from_tushare: 初始化config文件
+    """
+    mod_conf.generate_config_file(directory)
+
