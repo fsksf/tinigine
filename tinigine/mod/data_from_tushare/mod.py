@@ -1,9 +1,5 @@
 
-
 from tinigine.interface import AbstractModule
-from tinigine.utils.config import ConfigManager
-
-mod_conf = ConfigManager(mod_name='data_from_tushare')
 
 
 class DataFromTushare(AbstractModule):
