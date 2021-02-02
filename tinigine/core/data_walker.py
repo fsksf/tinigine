@@ -20,7 +20,7 @@ class DataWalker(Iterable):
         return self._sf.ix(self._index)
 
     def history(self, before_bar_count):
-        return self._sf.history(before_bar_count=before_bar_count)
+        return self._sf.history(start_id=self._index + 1, before_bar_count=before_bar_count)
 
     def get_index(self, _time):
         return self._sf.i_of(_time)

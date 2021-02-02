@@ -90,8 +90,29 @@ class SFrame:
         data.reset_index(inplace=True)
         return data
 
-    def history(self, before_bar_count):
-        pass
+    def history(self, start_id, before_bar_count):
+        end_id = start_id + 1
+        start_id = self.offset(end_id, -before_bar_count)
+
+        if not self.frame_dict:
+            return pd.DataFrame()
+        arr_list = []
+        symbol_list = []
+        for frame in self.frame_dict.values():
+            arr_list.append(frame.arr[start_id:end_id])
+            symbol_list.append(frame.columns)
+
+        index_obj = pd.MultiIndex.from_product([self.columns, self.index[start_id:end_id]], names=['symbol', 'timestamp']).swaplevel(0, 1)
+
+        all_arr = np.concatenate(arr_list)
+
+        data = pd.DataFrame(all_arr, index=index_obj, columns=self.columns)
+        data.reset_index(inplace=True)
+        return data
+
+    def offset(self, current_id, count):
+        out_id = current_id - count
+        return out_id
 
     def roll_calc(self, window, func):
         """
