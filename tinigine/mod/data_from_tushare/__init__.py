@@ -1,7 +1,8 @@
 import click
 from tinigine.__main__ import add_cmd
 from tinigine.utils.config import ConfigManager
-
+# for migrate
+from .model import *
 mod_conf = ConfigManager(mod_name='data_from_tushare')
 
 

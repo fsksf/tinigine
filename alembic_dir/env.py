@@ -7,7 +7,7 @@ from alembic import context
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from tinigine.utils import db
+from tinigine.utils.db import Base, SQLALCHEMY_DATABASE_URI
 from tinigine.mock_env import mock_env
 
 
@@ -18,14 +18,14 @@ config = context.config
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
-config.set_section_option(section='alembic', name='sqlalchemy.url', value=db.SQLALCHEMY_DATABASE_URI)
+config.set_section_option(section='alembic', name='sqlalchemy.url', value=SQLALCHEMY_DATABASE_URI)
 print(dir(config))
 
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = db.Base.metadata
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -79,8 +79,10 @@ def run_migrations_online():
             context.run_migrations()
 
 
-# if context.is_offline_mode():
-#     run_migrations_offline()
-# else:
 mock_env()
-run_migrations_online()
+
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()
