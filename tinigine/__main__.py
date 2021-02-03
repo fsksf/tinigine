@@ -6,9 +6,7 @@
 """
 from tinigine import CMD_LIST
 from tinigine.config import conf
-from tinigine.core.engine import Engine
-from tinigine.core.env import Environment
-from tinigine.core.params import Params
+from tinigine.mock_env import mock_env
 
 import click
 
@@ -38,9 +36,7 @@ def add_cmd(func):
 
 
 def entry():
-    params = Params()
-    env = Environment(params)
-    Engine(env).load_mod()
+    mock_env()
     for cmd in CMD_LIST:
         cli.add_command(cmd)
     cli()

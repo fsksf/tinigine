@@ -17,7 +17,7 @@ tushare.set_token(mod_conf.get_config()['token'])
 ts_pro = tushare.pro_api()
 
 
-class QuoteUtil:
+class DownloaderFromTushare:
 
     @staticmethod
     @lru_cache(4)
@@ -95,8 +95,9 @@ class QuoteUtil:
 
 
 if __name__ == '__main__':
-    symbols = QuoteUtil.load_basic()
+    symbols = DownloaderFromTushare.load_basic()
+    print(symbols)
     symbols = symbols.iloc[:5, 0]
-
-    quote = QuoteUtil.load_daily_hists_v(symbols, '20190101', '20190115')
+    print(symbols)
+    quote = DownloaderFromTushare.load_daily_hists_v(symbols, '20190101', '20190115')
     print(quote)

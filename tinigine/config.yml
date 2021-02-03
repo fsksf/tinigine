@@ -1,2 +1,7 @@
 
 mod: ["data_from_tushare"]
+
+log_level: "INFO"
+
+db:
+  main: "mysql+pymysql://root:@127.0.0.1/tinigine"
