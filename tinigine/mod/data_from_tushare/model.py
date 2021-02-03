@@ -26,7 +26,8 @@ class StockBasic(Base):
     list_date = Column(INT, doc='上市时间')
     delist_date = Column(INT, doc='退市时间')
 
-    __table_args__ = (Index('symbol'), )
+
+Index("stock_basic_symbol_ix", StockBasic.symbol)
 
 
 class QuoteDaily(Base):
@@ -39,3 +40,13 @@ class QuoteDaily(Base):
     low = Column(name='low', type_=FLOAT)
     close = Column(name='close', type_=FLOAT)
     volume = Column(type_=FLOAT, doc='成交量')
+
+
+Index('stock_quote_daily_symbol_timestamp_ix', QuoteDaily.symbol, QuoteDaily.timestamp)
+
+
+class DailyTradeCalender(Base):
+    __tablename__ = 'daily_trade_calender'
+    id = Column(type_=BigInteger, primary_key=True)
+    market = Column(type_=VARCHAR(10), doc='市场')
+    timestamp = Column(type_=INT, doc='交易日')
