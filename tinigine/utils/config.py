@@ -40,7 +40,7 @@ class ConfigManager:
             return ROOT_PATH
         return os.path.join(MOD_PATH, mod_name)
 
-    def get_mod_custom_dir(self, mod_name):
+    def get_mod_custom_dir(self, mod_name='system'):
         if mod_name == 'system':
             return ROOT_PATH
         return os.path.join(self.get_custom_dir(), mod_name)
@@ -108,3 +108,8 @@ class ConfigManager:
                 return f.read()
         except (FileExistsError, FileNotFoundError):
             return '0.0.0'
+
+    def from_dict(self, d):
+        self._config_obj = merge_dict(self._config_obj, d)
+        return self
+
