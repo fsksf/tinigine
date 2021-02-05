@@ -7,7 +7,7 @@
 from abc import ABC
 import click
 from tinigine.__main__ import cli
-from tinigine.utils.db import DBSession
+from tinigine.utils.db import DBConnect
 
 from tinigine.interface import AbstractDataProxy
 from .model import DailyTradeCalender, StockBasic
@@ -35,15 +35,15 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
             return mod_conf[self._env.params.freq]['start']
 
     def get_contract_info(self, symbols=None, market=None, industry=None):
-        s = DBSession()
-        data = s.query(StockBasic)
-        if symbols:
-            data = data.filter(StockBasic.symbol.in_(symbols))
-        if market:
-            data = data.filter(StockBasic.market == market)
-        if industry:
-            data = data.filter(StockBasic.industry == industry)
-        data = data.all()
+        with DBConnect() as s:
+            data = s.query(StockBasic)
+            if symbols:
+                data = data.filter(StockBasic.symbol.in_(symbols))
+            if market:
+                data = data.filter(StockBasic.market == market)
+            if industry:
+                data = data.filter(StockBasic.industry == industry)
+            data = data.all()
         return data
 
     def get_symbols(self):
@@ -56,12 +56,10 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         self.download_symbols()
 
     def download_symbols(self):
-        print(dir(DBSession()))
         new_basic = DataUtilFromTushare.load_basic(self._env.params.market)
         old_basic = self.get_contract_info()
 
-        s = DBSession()
-        del new_basic['code']
-        s.add_all([StockBasic(**kw) for kw in new_basic.to_dict(orient='record')])
-        s.commit()
-        s.close()
+        with DBConnect() as s
+            del new_basic['code']
+            s.add_all([StockBasic(**kw) for kw in new_basic.to_dict(orient='record')])
+            s.commit()
