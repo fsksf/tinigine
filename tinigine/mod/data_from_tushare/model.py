@@ -24,10 +24,11 @@ class StockBasic(Base):
     currency = Column(type_=VARCHAR(10), doc='币种')
     list_status = Column(type_=VARCHAR(4), doc='上市状态')
     list_date = Column(INT, doc='上市时间')
+    board = Column(type_=VARCHAR(10), doc='板块')
     delist_date = Column(INT, doc='退市时间')
 
 
-Index("stock_basic_symbol_ix", StockBasic.symbol)
+Index("stock_basic_symbol_ix", StockBasic.symbol, unique=True)
 
 
 class QuoteDaily(Base):

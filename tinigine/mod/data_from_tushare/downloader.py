@@ -1,103 +1,21 @@
-# -*- coding:utf-8 -*-
 """
-@author: ksf
-
-@since: 2019-10-29 08:55
+@project: tinigine
+@author: kang 
+@github: https://github.com/fsksf 
+@since: 2021/2/3 11:03 PM
 """
-import time
-import tushare
-from functools import lru_cache
-from requests.exceptions import ConnectionError
-import pandas as pd
-from tinigine.mod.data_from_tushare import mod_conf
+from .data_util import DataUtilFromTushare
 
 
-tushare.set_token(mod_conf.get_config()['token'])
-
-ts_pro = tushare.pro_api()
-
-
-class DownloaderFromTushare:
+class DownloadFromTushare:
 
     @staticmethod
-    @lru_cache(4)
-    def load_basic(market='CN'):
-        if market == 'CN':
-            contracts = ts_pro.stock_basic(list_status='L')
-            contracts.rename({'symbol': 'code', 'ts_code': 'symbol', 'market': 'board'}, inplace=True, axis=1)
-        else:
-            raise NotImplementedError
-        return contracts
+    def download_stock_basic(market='CN'):
+        data = DataUtilFromTushare.load_basic(market)
+        DataUtilFromTushare.load_calendar()
 
-    @staticmethod
-    def load_daily_hists_v(codes, start_date, end_date, market='CN'):
-        retry = 5
-        quote_list = []
-        if market == 'CN':
-            for code in codes:
-                retry_count = 0
-                while retry_count < retry:
-                    time.sleep(0.6)
-                    retry_count += 1
-                    try:
-                        single = ts_pro.daily(ts_code=code, start_date=start_date, end_date=end_date)
-                        quote_list.append(single[['ts_code', 'trade_date', 'open', 'high', 'low', 'close', 'vol']])
-                        break
-                    except ConnectionError as e:
-                        if retry_count == retry:
-                            raise
-                        else:
-                            time.sleep(3)
-        else:
-            raise NotImplementedError
+    def download_daily_quote(self):
+        pass
 
-        data = pd.concat(quote_list, ignore_index=True)
-        data.rename({'ts_code': 'symbol', 'vol': 'volume'}, inplace=True, axis=1)
-        return data
-
-    @staticmethod
-    def load_daily_hists_h(codes, trade_dates, market):
-        retry = 5
-        quote_list = []
-        if isinstance(codes, list):
-            ts_codes = ','.join(codes)
-        else:
-            ts_codes = codes
-        if market == 'CN':
-            for trade_date in trade_dates:
-                retry_count = 0
-                while retry_count < retry:
-                    time.sleep(0.6)
-                    retry_count += 1
-                    try:
-                        single = ts_pro.daily(ts_code=ts_codes, trade_date=trade_date)
-                        quote_list.append(single[['ts_code', 'trade_date', 'open', 'high', 'low', 'close', 'vol']])
-                        break
-                    except ConnectionError as e:
-                        if retry_count == retry:
-                            raise
-                        else:
-                            time.sleep(3)
-        else:
-            raise NotImplementedError
-
-        data = pd.concat(quote_list, ignore_index=True)
-        data.rename({'ts_code': 'symbol', 'vol': 'volume'}, inplace=True, axis=1)
-        return data
-
-    @staticmethod
-    def load_calendar(start_date=None, end_date=None, market='CN'):
-        if market == 'CN':
-            calendar = ts_pro.trade_cal(start_date=start_date, end_date=end_date, is_open=1)['cal_date'].to_list()
-            return [int(c) for c in calendar]
-        else:
-            raise NotImplementedError
-
-
-if __name__ == '__main__':
-    symbols = DownloaderFromTushare.load_basic()
-    print(symbols)
-    symbols = symbols.iloc[:5, 0]
-    print(symbols)
-    quote = DownloaderFromTushare.load_daily_hists_v(symbols, '20190101', '20190115')
-    print(quote)
+    def download_trade_calender(self):
+        pass

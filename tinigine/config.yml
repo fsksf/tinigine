@@ -1,4 +1,7 @@
 
+params:
+  market: "CN"
+
 mod: ["data_from_tushare"]
 
 log_level: "INFO"
