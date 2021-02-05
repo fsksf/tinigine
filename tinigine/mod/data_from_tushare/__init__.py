@@ -1,7 +1,8 @@
 import click
 from tinigine.__main__ import add_cmd
 from tinigine.utils.config import ConfigManager
-
+# for migrate
+from .model import *
 mod_conf = ConfigManager(mod_name='data_from_tushare')
 
 
@@ -12,7 +13,6 @@ def load():
 
 
 @add_cmd
-@click.command()
 @click.help_option('-h', '--help')
 @click.option('-m', '--market', default='CN', help='市场')
 @click.option('-f', '--freq', default='all', help='要更新的数据， {daily: 1d, minute: 1m, all: all}')
@@ -25,7 +25,6 @@ def dft_quote_init(ctx):
 
 
 @add_cmd
-@click.command()
 @click.help_option('-h', '--help')
 @click.option('-d', '--directory', type=click.Path(), default=None)
 def dft_gen_config(directory):

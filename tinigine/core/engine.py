@@ -19,13 +19,16 @@ class Engine:
 
     def initialize(self):
         self._env.event_bus.emit(Event(EventType.INITIALIZE))
+        self.load_mod()
 
     def load_mod(self):
+        self._env.logger.info('loading mods')
         mod_names = self._env.conf.get_config()['mod']
         for mod_name in mod_names:
             mod = self._import_mod(mod_name)
             if mod:
                 self._mod_list.append(mod.load())
+        self.set_up()
 
     def _import_mod(self, name):
         try:
@@ -47,7 +50,6 @@ class Engine:
         event_bus = self._env.event_bus
         event_source = self._env.event_source
         self.initialize()
-        self.set_up()
         for event in event_source.events():
             event_bus.emit(event)
         if self._env.metrics:
@@ -55,9 +57,12 @@ class Engine:
         self.tear_down()
 
     def set_up(self):
+        self._env.logger.info('setting up mods')
         for mod in self._mod_list:
             mod.set_up(env=self._env)
+        self._env.logger.info('set up mods complete...')
 
     def tear_down(self):
+        self._env.logger.info('tear down mods')
         for mod in self._mod_list:
             mod.tear_down()
