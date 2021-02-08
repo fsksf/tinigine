@@ -43,7 +43,7 @@ class QuoteDaily(Base):
     volume = Column(type_=FLOAT, doc='成交量')
 
 
-Index('stock_quote_daily_symbol_timestamp_ix', QuoteDaily.symbol, QuoteDaily.timestamp)
+Index('stock_quote_daily_symbol_timestamp_ix', QuoteDaily.symbol, QuoteDaily.timestamp, unique=True)
 
 
 class DailyTradeCalender(Base):
