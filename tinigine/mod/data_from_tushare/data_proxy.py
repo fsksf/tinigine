@@ -7,7 +7,7 @@
 from abc import ABC
 import click
 from tinigine.__main__ import cli
-from tinigine.utils.db import DBConnect
+from tinigine.utils.db import DBConnect, DBUtil
 
 from tinigine.interface import AbstractDataProxy
 from .model import DailyTradeCalender, StockBasic
@@ -49,7 +49,7 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
     def get_symbols(self):
         pass
 
-    def update_data(self):
+    def data_update(self):
         """
         初始化、更新数据
         """
@@ -57,9 +57,8 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
 
     def download_symbols(self):
         new_basic = DataUtilFromTushare.load_basic(self._env.params.market)
-        old_basic = self.get_contract_info()
+        del new_basic['code']
+        DBUtil.upsert(StockBasic, new_basic.to_dict(orient='record'), unique=[StockBasic.symbol, ])
 
-        with DBConnect() as s
-            del new_basic['code']
-            s.add_all([StockBasic(**kw) for kw in new_basic.to_dict(orient='record')])
-            s.commit()
+    def download_calender(self):
+        pass
