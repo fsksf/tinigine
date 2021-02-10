@@ -1,6 +1,7 @@
 
 params:
   market: "CN"
+  start: "20100101"
 
 mod: ["data_from_tushare"]
 

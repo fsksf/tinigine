@@ -24,6 +24,8 @@ class Environment(AbstractEnv):
         self.logger = get_logger(log_type='system', level=params.log_level)
         self.strategy = Strategy(env=self, algo_text=params.algo_text, log_level=params.log_level)
         self.conf = conf
+        self.logger.info(str(params))
+
 
     def set_event_source(self, event_source):
         self.event_source = event_source

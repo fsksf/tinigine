@@ -16,13 +16,15 @@ from tinigine.mod.data_from_tushare import mod_conf
 
 
 class MysqlDataProxy(AbstractDataProxy, ABC):
+    def __init__(self, env):
+        super(MysqlDataProxy, self).__init__(env)
 
     def get_sf(self):
         pass
 
     def get_calendar(self):
-        with DBSession() as s:
-            data = s.query(DailyTradeCalender.timestamp).fliter(
+        with DBConnect() as s:
+            data = s.query(DailyTradeCalender.timestamp).filter(
                 DailyTradeCalender.market == self._env.params.market
             ).all()
         return [d[0] for d in data]
@@ -54,11 +56,26 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         初始化、更新数据
         """
         self.download_symbols()
+        self.download_calender()
 
     def download_symbols(self):
         new_basic = DataUtilFromTushare.load_basic(self._env.params.market)
         del new_basic['code']
-        DBUtil.upsert(StockBasic, new_basic.to_dict(orient='record'), unique=[StockBasic.symbol, ])
+        DBUtil.upsert(StockBasic, new_basic.to_dict(orient='records'), unique=[StockBasic.symbol, ])
 
     def download_calender(self):
+        params = self._env.params
+        start_date = params.start
+        end_date = params.end
+        last_sync_date = self.get_calendar()
+        if last_sync_date:
+            start_date = last_sync_date[-1] + 1
+        self.start_date = start_date
+        self.end_date = end_date
+        calendar = DataUtilFromTushare.load_calendar(start_date=start_date, end_date=end_date)
+        calendar = [{'market': str(params.market), 'timestamp': c} for c in calendar]
+        if calendar:
+            DBUtil.insert(DailyTradeCalender, calendar)
+
+    def download_quote(self):
         pass
