@@ -68,5 +68,12 @@ class DBUtil:
     def update(model_obj, field_dict_list, unique):
         with DBConnect() as s:
             for d in field_dict_list:
-                filter_dict = {k: d.pop(k.name) for k in unique}
-                s.query(model_obj).filter(**filter_dict).update(d)
+                filter_list = []
+                for filter_obj in unique:
+                    filter_value = d.pop(filter_obj.name)
+                    if isinstance(filter_value, (tuple, list)):
+                        filter_list.append(filter_obj.in_(filter_value))
+                    else:
+                        filter_list.append(filter_obj == filter_value)
+                s.query(model_obj).filter(*filter_list).update(d)
+                s.commit()

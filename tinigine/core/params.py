@@ -29,3 +29,6 @@ class Params:
 
     def set_algo(self, algo_text):
         self.algo_text = algo_text
+
+    def __str__(self):
+        return str("<Params>: " + str(self.__dict__))
