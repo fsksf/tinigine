@@ -32,7 +32,7 @@ class AbstractDataProxy:
         """
         raise NotImplementedError
 
-    def get_calendar(self):
+    def get_calendar(self, start=None, end=None):
         """
         获取交易日历
         :return:
