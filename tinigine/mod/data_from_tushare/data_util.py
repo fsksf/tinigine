@@ -64,7 +64,7 @@ class DataUtilFromTushare:
             ts_codes = ','.join(codes)
         else:
             ts_codes = codes
-        if market == 'CN':
+        if market == Market.CN:
             for trade_date in trade_dates:
                 retry_count = 0
                 while retry_count < retry:

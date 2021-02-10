@@ -26,7 +26,6 @@ class Environment(AbstractEnv):
         self.conf = conf
         self.logger.info(str(params))
 
-
     def set_event_source(self, event_source):
         self.event_source = event_source
 
