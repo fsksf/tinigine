@@ -62,7 +62,7 @@ class DBUtil:
                             filter_list.append(filter_obj == filter_value)
                     s.query(model_obj).filter(*filter_list).update(d)
                     s.commit()
-                return
+            return
 
     @staticmethod
     def update(model_obj, field_dict_list, unique):
