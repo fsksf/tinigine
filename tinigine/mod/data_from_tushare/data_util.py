@@ -57,7 +57,7 @@ class DataUtilFromTushare:
         return data
 
     @staticmethod
-    def load_daily_hists_h(codes, trade_dates, market):
+    def load_daily_hists_h(codes=None, trade_dates=None, market=None):
         retry = 5
         quote_list = []
         if isinstance(codes, list):

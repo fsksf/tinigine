@@ -93,7 +93,7 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         total = len(calendar)
         for c in calendar:
             count += 1
-            data = DataUtilFromTushare.load_daily_hists_h(codes=symbols, trade_dates=[c], market=self._env.params.market)
+            data = DataUtilFromTushare.load_daily_hists_h(trade_dates=[c], market=self._env.params.market)
             data.rename(columns={'trade_date': 'timestamp', 'vol': 'volume'}, inplace=True)
             data = data.to_dict(orient='records')
             self._env.logger.info(f'download quote from tushare date: {c}, progress: {count}/{total}')
