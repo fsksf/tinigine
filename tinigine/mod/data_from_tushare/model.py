@@ -46,6 +46,17 @@ class QuoteDaily(Base):
 Index('stock_quote_daily_symbol_timestamp_ix', QuoteDaily.symbol, QuoteDaily.timestamp, unique=True)
 
 
+class QuoteAdjFactors(Base):
+    __tablename__ = 'stock_adj_factor'
+    id = Column(type_=BigInteger, primary_key=True)
+    symbol = Column(type_=VARCHAR(20))
+    timestamp = Column(type_=INT, doc='时间')
+    adj_factor = Column(type_=FLOAT, doc='复权因子')
+
+
+Index('stock_adj_factor_symbol_timestamp_ix', QuoteAdjFactors.symbol, QuoteAdjFactors.timestamp, unique=True)
+
+
 class DailyTradeCalender(Base):
     __tablename__ = 'daily_trade_calender'
     id = Column(type_=BigInteger, primary_key=True)
