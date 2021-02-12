@@ -20,7 +20,7 @@ from tinigine.api import *
 
 def initialize(context):
     print(context)
-    subscribe('000001', 10)
+    subscribe('000001.SZ', 10)
     
 def on_bar(context, data):
     print(context)

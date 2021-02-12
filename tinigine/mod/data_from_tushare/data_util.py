@@ -21,6 +21,22 @@ ts_pro = tushare.pro_api()
 class DataUtilFromTushare:
 
     @staticmethod
+    def query(codes, start_date, end_date, market='CN'):
+        retry_count = 0
+        retry = 5
+        while retry_count < retry:
+            time.sleep(0.6)
+            retry_count += 1
+            try:
+                single = ts_pro.daily(ts_code=ts_codes, trade_date=trade_date)
+                return single
+            except ConnectionError as e:
+                if retry_count == retry:
+                    raise
+                else:
+                    time.sleep(3)
+
+    @staticmethod
     @lru_cache(4)
     def load_basic(market='CN'):
         if market == Market.CN:
@@ -94,6 +110,9 @@ class DataUtilFromTushare:
         else:
             raise NotImplementedError
 
+    @staticmethod
+    def load_adj_factors(start_date=None, end_date=None, market='CN'):
+        ts_pro.adj_factor()
 
 if __name__ == '__main__':
     symbols = DataUtilFromTushare.load_basic()
