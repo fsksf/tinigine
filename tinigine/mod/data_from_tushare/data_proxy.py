@@ -66,7 +66,7 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         """
         symbols = self.download_symbols()
         start, end = self.download_calender()
-        self.download_quote(symbols, 20100104, 20211231)
+        self.download_quote(symbols, 20170331, end)
 
     def download_symbols(self):
         new_basic = DataUtilFromTushare.load_basic(self._env.params.market)
@@ -98,3 +98,6 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
             data = data.to_dict(orient='records')
             self._env.logger.info(f'download quote from tushare date: {c}, progress: {count}/{total}')
             DBUtil.upsert(QuoteDaily, data, unique=[QuoteDaily.symbol, QuoteDaily.timestamp])
+
+    def download_factors(self, symbols, start, end):
+        DataUtilFromTushare.load_basic()

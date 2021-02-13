@@ -76,39 +76,28 @@ class SFrame:
     def to_dataframe(self):
         if not self.frame_dict:
             return pd.DataFrame()
-        arr_list = []
-        symbol_list = []
-        for frame in self.frame_dict.values():
-            arr_list.append(frame.arr)
-            symbol_list.append(frame.symbol)
 
-        index_obj = pd.MultiIndex.from_product([symbol_list, self.index], names=['symbol', 'timestamp']).swaplevel(0, 1)
+        field_sr_list = []
+        for field_name, frame in self.frame_dict.items():
+            df = frame.to_dataframe()
+            sr = df.stack()
+            sr.name = field_name
+            field_sr_list.append(sr)
 
-        all_arr = np.concatenate(arr_list)
-
-        data = pd.DataFrame(all_arr, index=index_obj, columns=self.columns)
-        data.reset_index(inplace=True)
-        return data
+        all_arr = pd.concat(field_sr_list, axis=1)
+        return all_arr
 
     def history(self, start_id, before_bar_count):
         end_id = start_id + 1
-        start_id = self.offset(end_id, -before_bar_count)
+        start_id = self.offset(end_id, before_bar_count)
 
         if not self.frame_dict:
             return pd.DataFrame()
-        arr_list = []
-        symbol_list = []
-        for frame in self.frame_dict.values():
-            arr_list.append(frame.arr[start_id:end_id])
-            symbol_list.append(frame.columns)
-
-        index_obj = pd.MultiIndex.from_product([self.columns, self.index[start_id:end_id]], names=['symbol', 'timestamp']).swaplevel(0, 1)
-
-        all_arr = np.concatenate(arr_list)
-
-        data = pd.DataFrame(all_arr, index=index_obj, columns=self.columns)
-        data.reset_index(inplace=True)
-        return data
+        out = SFrame()
+        for field_name, frame in self.frame_dict.items():
+            out.add(Frame(arr=frame.arr[start_id: end_id], index=frame.index[start_id: end_id], columns=frame.columns,
+                          name=field_name))
+        return out
 
     def offset(self, current_id, count):
         out_id = current_id - count
