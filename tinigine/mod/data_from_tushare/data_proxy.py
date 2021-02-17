@@ -58,9 +58,9 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         symbols_info_list = self.get_contract_info(symbols=None, market=str(self._env.params.market))
         return [d.symbol for d in symbols_info_list]
 
-    def data_update(self):
+    def dft_data_update(self):
         """
-        初始化、更新数据
+        data_from_tushare: 初始化、更新数据
         """
         symbols = self.download_symbols()
         start, end = self.download_calender()
