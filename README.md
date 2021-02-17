@@ -2,7 +2,17 @@
 
 模块化、微内核量化回测引擎
 
+# 安装
+
+## 源码安装
+```bash
+git clone git@github.com:fsksf/tinigine.git
+cd tinigine
+pip install -e .
+```
+
 # 命令
+
 ## 更新表结构
 ```bash
 alembic revision --autogenerate -m "commit message"
@@ -20,9 +30,8 @@ Options:
   --version   Show the version and exit.
 
 Commands:
-  data-update     初始化、更新数据
-  dft-gen-config  data_from_tushare: 初始化config文件
-  dft-quote-init  初始化行情数据
-  gen-config      生成配置文件
+  dft-data-update  data_from_tushare: 初始化、更新数据
+  dft-gen-config   data_from_tushare: 初始化config文件
+  gen-config       生成配置文件
 
 ```
