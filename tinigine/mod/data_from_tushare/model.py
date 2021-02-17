@@ -65,3 +65,6 @@ class DailyTradeCalender(Base):
     id = Column(type_=BigInteger, primary_key=True)
     market = Column(type_=VARCHAR(10), doc='市场')
     timestamp = Column(type_=INT, doc='交易日')
+
+
+Index('daily_trade_calender_market_timestamp_ix', DailyTradeCalender.market, DailyTradeCalender.timestamp, unique=True)
