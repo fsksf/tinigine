@@ -42,6 +42,7 @@ class DataUtilFromTushare:
         if market == Market.CN:
             contracts = ts_pro.stock_basic(list_status='L')
             contracts.rename({'symbol': 'code', 'ts_code': 'symbol', 'market': 'board'}, inplace=True, axis=1)
+            contracts['market'] = market.name
         else:
             raise NotImplementedError
         return contracts
