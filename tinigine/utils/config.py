@@ -113,3 +113,13 @@ class ConfigManager:
         self._config_obj = merge_dict(self._config_obj, d)
         return self
 
+    def save(self):
+        """
+        保存到用户家目录的配置文件
+        项目目录配置文件不支持自动保存，只能手动修改
+        :return:
+        """
+        path = self.get_custom_config_path()
+        with open(path, mode='w+') as f:
+            yaml.safe_dump(self._config_obj, stream=f)
+

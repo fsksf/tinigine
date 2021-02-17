@@ -5,8 +5,6 @@
 @since: 2021/2/3 11:10 PM
 """
 from abc import ABC
-import click
-from tinigine.__main__ import cli
 from tinigine.utils.db import DBConnect, DBUtil
 
 from tinigine.interface import AbstractDataProxy

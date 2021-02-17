@@ -38,7 +38,7 @@ class DataUtilFromTushare:
 
     @staticmethod
     @lru_cache(4)
-    def load_basic(market='CN'):
+    def load_basic(market=Market.CN):
         if market == Market.CN:
             contracts = ts_pro.stock_basic(list_status='L')
             contracts.rename({'symbol': 'code', 'ts_code': 'symbol', 'market': 'board'}, inplace=True, axis=1)
@@ -47,10 +47,10 @@ class DataUtilFromTushare:
         return contracts
 
     @staticmethod
-    def load_daily_hists_v(codes, start_date, end_date, market='CN'):
+    def load_daily_hists_v(codes, start_date, end_date, market=Market.CN):
         retry = 5
         quote_list = []
-        if market == 'CN':
+        if market == Market.CN:
             for code in codes:
                 retry_count = 0
                 while retry_count < retry:
@@ -103,16 +103,18 @@ class DataUtilFromTushare:
         return data
 
     @staticmethod
-    def load_calendar(start_date=None, end_date=None, market='CN'):
-        if market == 'CN':
+    def load_calendar(start_date=None, end_date=None, market=Market.CN):
+        if market == Market.CN:
             calendar = ts_pro.trade_cal(start_date=start_date, end_date=end_date, is_open=1)['cal_date'].to_list()
             return [int(c) for c in calendar]
         else:
             raise NotImplementedError
 
     @staticmethod
-    def load_adj_factors(start_date=None, end_date=None, market='CN'):
-        ts_pro.adj_factor()
+    def load_adj_factors(start_date=None, end_date=None, market=Market.CN):
+        for symbol in DataUtilFromTushare.load_basic()['symbol']:
+            df = ts_pro.adj_factor(ts_code=symbol, trade_date='')
+
 
 if __name__ == '__main__':
     symbols = DataUtilFromTushare.load_basic()
@@ -121,3 +123,5 @@ if __name__ == '__main__':
     print(symbols)
     quote = DataUtilFromTushare.load_daily_hists_v(symbols, '20190101', '20190115')
     print(quote)
+    calendar = ts_pro.trade_cal(start_date='20100101', end_date='20210101', is_open=1)['cal_date'].to_list()
+    print(calendar[::-1])
