@@ -64,7 +64,7 @@ class ConfigManager:
 
     @staticmethod
     def read_yml(file_path):
-        with open(file_path, 'r') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             config_obj = yaml.safe_load(f)
             return config_obj
 
@@ -104,7 +104,7 @@ class ConfigManager:
         :return:
         """
         try:
-            with open(os.path.join(self.get_mod_custom_dir(self._mod_name), 'VERSION.txt'), 'r') as f:
+            with open(os.path.join(self.get_mod_custom_dir(self._mod_name), 'VERSION.txt'), 'r', encoding='utf-8') as f:
                 return f.read()
         except (FileExistsError, FileNotFoundError):
             return '0.0.0'
@@ -112,4 +112,14 @@ class ConfigManager:
     def from_dict(self, d):
         self._config_obj = merge_dict(self._config_obj, d)
         return self
+
+    def save(self):
+        """
+        保存到用户家目录的配置文件
+        项目目录配置文件不支持自动保存，只能手动修改
+        :return:
+        """
+        path = self.get_custom_config_path()
+        with open(path, mode='w+') as f:
+            yaml.safe_dump(self._config_obj, stream=f)
 

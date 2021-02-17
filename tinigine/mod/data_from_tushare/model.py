@@ -32,6 +32,7 @@ Index("stock_basic_symbol_ix", StockBasic.symbol, unique=True)
 
 
 class QuoteDaily(Base):
+    """日线行情"""
     __tablename__ = 'stock_quote_daily'
     id = Column(type_=BigInteger, primary_key=True)
     symbol = Column(name='symbol', type_=VARCHAR(20))
@@ -47,6 +48,7 @@ Index('stock_quote_daily_symbol_timestamp_ix', QuoteDaily.symbol, QuoteDaily.tim
 
 
 class QuoteAdjFactors(Base):
+    """复权因子"""
     __tablename__ = 'stock_adj_factor'
     id = Column(type_=BigInteger, primary_key=True)
     symbol = Column(type_=VARCHAR(20))
@@ -58,6 +60,7 @@ Index('stock_adj_factor_symbol_timestamp_ix', QuoteAdjFactors.symbol, QuoteAdjFa
 
 
 class DailyTradeCalender(Base):
+    """日线日历，会提前一整年"""
     __tablename__ = 'daily_trade_calender'
     id = Column(type_=BigInteger, primary_key=True)
     market = Column(type_=VARCHAR(10), doc='市场')

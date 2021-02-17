@@ -37,12 +37,15 @@ class Engine:
         except ImportError:
             self._env.logger.info(f'standard path not fund')
             try:
-                custom_dir = os.path.join(self._env.conf.get_mod_custom_dir(), 'mods')
-                if sys.path.index(custom_dir) < 0:
-                    sys.path.insert(0, custom_dir)
-                mod = import_module(mod)
+                try:
+                    custom_dir = os.path.join(self._env.conf.get_mod_custom_dir(), 'mod')
+                    if sys.path.index(custom_dir) < 0:
+                        sys.path.insert(0, custom_dir)
+                except ValueError:
+                    pass
+                mod = import_module(name)
             except ImportError:
-                self._env.logger.error(f'mod_import_error: {mod}')
+                self._env.logger.error(f'mod_import_error: {name}')
                 return None
         return mod
 

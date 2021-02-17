@@ -21,7 +21,7 @@ class Params:
         self.algo_file = algo_file
 
         if not algo_text and algo_file:
-            with open(algo_file, 'r') as f:
+            with open(algo_file, 'r', encoding='utf-8') as f:
                 algo_text = f.read()
         self.algo_text = algo_text
         self.capital = capital
