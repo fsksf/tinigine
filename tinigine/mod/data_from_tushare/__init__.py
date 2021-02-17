@@ -14,18 +14,6 @@ def load():
 
 @add_cmd
 @click.help_option('-h', '--help')
-@click.option('-m', '--market', default='CN', help='市场')
-@click.option('-f', '--freq', default='all', help='要更新的数据， {daily: 1d, minute: 1m, all: all}')
-@click.pass_context
-def dft_quote_init(ctx):
-    """
-    初始化行情数据
-    """
-    pass
-
-
-@add_cmd
-@click.help_option('-h', '--help')
 @click.option('-d', '--directory', type=click.Path(), default=None)
 def dft_gen_config(directory):
     """
