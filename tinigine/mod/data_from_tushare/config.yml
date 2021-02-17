@@ -4,3 +4,7 @@ token: ""
 
 1d:
   start: 20100101
+
+download_index:
+  start: 20100101
+  end: 20210101     # 数据更新位置标记，家目录会存在一份！
