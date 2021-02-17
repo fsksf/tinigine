@@ -20,10 +20,10 @@ setup(
     packages=['tinigine', 'tinigine.core', 'tinigine.utils', 'tinigine.samples'],
     author='fsksf',
     author_email='timeless.go@foxmail.com',
-    description='stock local data',
+    description='tini engine',
     package_data={'': ['*.*']},
     include_package_data=True,
-    url='https://github.com/fsksf/ginkgo',
+    url='https://github.com/fsksf/tinigine',
     entry_points={
         "console_scripts": [
             "tinigine = tinigine.__main__:entry"

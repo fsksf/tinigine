@@ -5,6 +5,7 @@
 @since: 2021/2/3 11:10 PM
 """
 from abc import ABC
+import datetime
 from tinigine.utils.db import DBConnect, DBUtil
 
 from tinigine.interface import AbstractDataProxy
@@ -23,7 +24,7 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
     def get_calendar(self, start=None, end=None):
         with DBConnect() as s:
             data = s.query(DailyTradeCalender.timestamp).filter(
-                DailyTradeCalender.market == self._env.params.market
+                DailyTradeCalender.market == self._env.params.market.name
             )
             if start:
                 data = data.filter(
@@ -58,13 +59,13 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         symbols_info_list = self.get_contract_info(symbols=None, market=str(self._env.params.market))
         return [d.symbol for d in symbols_info_list]
 
-    def data_update(self):
+    def dft_data_update(self):
         """
-        初始化、更新数据
+        data_from_tushare: 初始化、更新数据
         """
         symbols = self.download_symbols()
         start, end = self.download_calender()
-        self.download_quote(symbols, 20170331, end)
+        self.download_quote(symbols, start, end)
 
     def download_symbols(self):
         new_basic = DataUtilFromTushare.load_basic(self._env.params.market)
@@ -76,19 +77,23 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         params = self._env.params
         start_date = params.start
         end_date = params.end
+        if end_date is None:
+            params.end = end_date = datetime.datetime.today().strftime('%Y%m%d')
         last_sync_date = self.get_calendar()
         if last_sync_date:
-            start_date = last_sync_date[-1] + 1
+            start_date = last_sync_date[-1] - 7
         calendar = DataUtilFromTushare.load_calendar(start_date=start_date, end_date=end_date)
-        calendar = [{'market': str(params.market), 'timestamp': c} for c in calendar]
+        calendar = [{'market': str(params.market.name), 'timestamp': c} for c in calendar]
         if calendar:
-            DBUtil.insert(DailyTradeCalender, calendar)
+            DBUtil.upsert(DailyTradeCalender, calendar, unique=[DailyTradeCalender.market, DailyTradeCalender.timestamp])
         return start_date, end_date
 
     def download_quote(self, symbols, start, end):
+        self._env.logger.info(f'download quote from {start} to {end}')
         calendar = self.get_calendar(start, end)
         count = 0
         total = len(calendar)
+
         for c in calendar:
             count += 1
             data = DataUtilFromTushare.load_daily_hists_h(trade_dates=[c], market=self._env.params.market)

@@ -10,7 +10,7 @@ class DataFromTushare(AbstractModule):
         self._env: AbstractEnv = env
         data_proxy = MysqlDataProxy(env=self._env)
         self._env.set_data_proxy(data_proxy)
-        add_cmd(self._env.data_proxy.data_update)
+        add_cmd(self._env.data_proxy.dft_data_update)
 
 
     def tear_down(self):
