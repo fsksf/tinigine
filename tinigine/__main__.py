@@ -39,7 +39,6 @@ def add_cmd(func):
 def entry():
     mock_env()
     for cmd in CMD_LIST:
-        print(cmd)
         cli.add_command(cmd)
     cli()
 
