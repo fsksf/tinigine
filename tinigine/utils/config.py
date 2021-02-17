@@ -64,7 +64,7 @@ class ConfigManager:
 
     @staticmethod
     def read_yml(file_path):
-        with open(file_path, 'r') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             config_obj = yaml.safe_load(f)
             return config_obj
 
@@ -104,7 +104,7 @@ class ConfigManager:
         :return:
         """
         try:
-            with open(os.path.join(self.get_mod_custom_dir(self._mod_name), 'VERSION.txt'), 'r') as f:
+            with open(os.path.join(self.get_mod_custom_dir(self._mod_name), 'VERSION.txt'), 'r', encoding='utf-8') as f:
                 return f.read()
         except (FileExistsError, FileNotFoundError):
             return '0.0.0'
