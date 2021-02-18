@@ -8,6 +8,7 @@ from abc import ABC
 import datetime
 import sqlalchemy.exc as sqlexc
 from tinigine.utils.db import DBConnect, DBUtil
+from tinigine.utils.datetime_utils import day_count
 
 from tinigine.interface import AbstractDataProxy
 from .model import DailyTradeCalender, StockBasic, QuoteDaily, QuoteAdjFactors
@@ -67,6 +68,7 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         symbols = self.download_symbols()
         start, end = self.download_calender()
         self.download_quote(symbols, start, end)
+        # start, end = 20100101, 20210101
         self.download_factors(symbols, start=start, end=end)
 
     def download_symbols(self):
@@ -86,9 +88,9 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
             start_date = last_sync_date[-1] - 7
         calendar = DataUtilFromTushare.load_calendar(start_date=start_date, end_date=end_date)
         calendar = [{'market': str(params.market.name), 'timestamp': c} for c in calendar]
-        if calendar:
+        for cal in calendar:
             try:
-                DBUtil.insert(DailyTradeCalender, calendar)
+                DBUtil.insert(DailyTradeCalender, [cal])
             except sqlexc.IntegrityError:
                 pass
         return start_date, end_date
@@ -108,12 +110,14 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
             DBUtil.upsert(QuoteDaily, data, unique=[QuoteDaily.symbol, QuoteDaily.timestamp])
 
     def download_factors(self, symbols, start, end):
-        count = 0
         total = len(symbols)
-        self._env.logger.info(f'download adj factors from {start} to {end} with symbols count {total}')
-        for symbol in symbols:
-            count += 1
-            self._env.logger.info(f'download adj factors from tushare symbol: {symbol}, progress: {count}/{total}')
+        day_count_len = day_count(start, end)
+        step_len = total // day_count_len
+        fetch_count = total // step_len + 1
+        self._env.logger.info(f'download adj factors from {start} to {end} with symbols count {total}, step: {step_len}')
+        for i in range(0, total, step_len):
+            symbol = symbols[i:i+step_len]
+            self._env.logger.info(f'download adj factors from tushare, progress: {i}/{fetch_count}')
             data = DataUtilFromTushare.load_adj_factors(symbols=symbol, start_date=start, end_date=end)
             data = data.to_dict(orient='records')
             DBUtil.upsert(QuoteAdjFactors, data, unique=[QuoteAdjFactors.symbol, QuoteAdjFactors.timestamp])

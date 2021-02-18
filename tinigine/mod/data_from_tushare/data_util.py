@@ -95,7 +95,7 @@ class DataUtilFromTushare:
     @staticmethod
     def load_adj_factors(symbols=None, start_date=None, end_date=''):
         df = DataUtilFromTushare.query('adj_factor', ts_code=symbols, start_date=start_date, end_date=end_date)
-        mask = df['adj_factor'].pct_change() != 0.0
+        mask = df['adj_factor'].pct_change(periods=-1) != 0.0
         df = df.loc[mask]
         df.rename({'ts_code': 'symbol', 'trade_date': 'timestamp'}, inplace=True, axis=1)
         return df
