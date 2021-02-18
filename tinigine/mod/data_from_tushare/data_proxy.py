@@ -6,10 +6,11 @@
 """
 from abc import ABC
 import datetime
+import sqlalchemy.exc as sqlexc
 from tinigine.utils.db import DBConnect, DBUtil
 
 from tinigine.interface import AbstractDataProxy
-from .model import DailyTradeCalender, StockBasic, QuoteDaily
+from .model import DailyTradeCalender, StockBasic, QuoteDaily, QuoteAdjFactors
 from .downloader import DataUtilFromTushare
 from tinigine.mod.data_from_tushare import mod_conf
 
@@ -56,7 +57,7 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         return data
 
     def get_symbols(self):
-        symbols_info_list = self.get_contract_info(symbols=None, market=str(self._env.params.market))
+        symbols_info_list = self.get_contract_info(symbols=None, market=str(self._env.params.market.name))
         return [d.symbol for d in symbols_info_list]
 
     def dft_data_update(self):
@@ -66,6 +67,7 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         symbols = self.download_symbols()
         start, end = self.download_calender()
         self.download_quote(symbols, start, end)
+        self.download_factors(symbols, start=start, end=end)
 
     def download_symbols(self):
         new_basic = DataUtilFromTushare.load_basic(self._env.params.market)
@@ -85,7 +87,10 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         calendar = DataUtilFromTushare.load_calendar(start_date=start_date, end_date=end_date)
         calendar = [{'market': str(params.market.name), 'timestamp': c} for c in calendar]
         if calendar:
-            DBUtil.upsert(DailyTradeCalender, calendar, unique=[DailyTradeCalender.market, DailyTradeCalender.timestamp])
+            try:
+                DBUtil.insert(DailyTradeCalender, calendar)
+            except sqlexc.IntegrityError:
+                pass
         return start_date, end_date
 
     def download_quote(self, symbols, start, end):
@@ -103,4 +108,12 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
             DBUtil.upsert(QuoteDaily, data, unique=[QuoteDaily.symbol, QuoteDaily.timestamp])
 
     def download_factors(self, symbols, start, end):
-        DataUtilFromTushare.load_basic()
+        count = 0
+        total = len(symbols)
+        self._env.logger.info(f'download adj factors from {start} to {end} with symbols count {total}')
+        for symbol in symbols:
+            count += 1
+            self._env.logger.info(f'download adj factors from tushare symbol: {symbol}, progress: {count}/{total}')
+            data = DataUtilFromTushare.load_adj_factors(symbols=symbol, start_date=start, end_date=end)
+            data = data.to_dict(orient='records')
+            DBUtil.upsert(QuoteAdjFactors, data, unique=[QuoteAdjFactors.symbol, QuoteAdjFactors.timestamp])

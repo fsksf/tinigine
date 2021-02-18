@@ -21,14 +21,18 @@ ts_pro = tushare.pro_api()
 class DataUtilFromTushare:
 
     @staticmethod
-    def query(codes, start_date, end_date, market='CN'):
+    def query(api_name, fields='', **kwargs):
         retry_count = 0
         retry = 5
+        ts_code = kwargs.get('ts_code', None)
+        if ts_code is not None and isinstance(ts_code, (list, tuple)):
+            kwargs['ts_code'] = ','.join(ts_code)
+
         while retry_count < retry:
             time.sleep(0.6)
             retry_count += 1
             try:
-                single = ts_pro.daily(ts_code=ts_codes, trade_date=trade_date)
+                single = ts_pro.query(api_name, fields, **kwargs)
                 return single
             except ConnectionError as e:
                 if retry_count == retry:
@@ -49,23 +53,11 @@ class DataUtilFromTushare:
 
     @staticmethod
     def load_daily_hists_v(codes, start_date, end_date, market=Market.CN):
-        retry = 5
         quote_list = []
         if market == Market.CN:
             for code in codes:
-                retry_count = 0
-                while retry_count < retry:
-                    time.sleep(0.6)
-                    retry_count += 1
-                    try:
-                        single = ts_pro.daily(ts_code=code, start_date=start_date, end_date=end_date)
-                        quote_list.append(single[['ts_code', 'trade_date', 'open', 'high', 'low', 'close', 'vol']])
-                        break
-                    except ConnectionError as e:
-                        if retry_count == retry:
-                            raise
-                        else:
-                            time.sleep(3)
+                single = DataUtilFromTushare.query('daily', ts_code=code, start_date=start_date, end_date=end_date)
+                quote_list.append(single[['ts_code', 'trade_date', 'open', 'high', 'low', 'close', 'vol']])
         else:
             raise NotImplementedError
 
@@ -75,7 +67,7 @@ class DataUtilFromTushare:
 
     @staticmethod
     def load_daily_hists_h(codes=None, trade_dates=None, market=None):
-        retry = 5
+
         quote_list = []
         if isinstance(codes, list):
             ts_codes = ','.join(codes)
@@ -83,19 +75,8 @@ class DataUtilFromTushare:
             ts_codes = codes
         if market == Market.CN:
             for trade_date in trade_dates:
-                retry_count = 0
-                while retry_count < retry:
-                    time.sleep(0.6)
-                    retry_count += 1
-                    try:
-                        single = ts_pro.daily(ts_code=ts_codes, trade_date=trade_date)
-                        quote_list.append(single[['ts_code', 'trade_date', 'open', 'high', 'low', 'close', 'vol']])
-                        break
-                    except ConnectionError as e:
-                        if retry_count == retry:
-                            raise
-                        else:
-                            time.sleep(3)
+                single = DataUtilFromTushare.query('daily', ts_code=ts_codes, trade_date=trade_date)
+                quote_list.append(single[['ts_code', 'trade_date', 'open', 'high', 'low', 'close', 'vol']])
         else:
             raise NotImplementedError
 
@@ -112,9 +93,12 @@ class DataUtilFromTushare:
             raise NotImplementedError
 
     @staticmethod
-    def load_adj_factors(start_date=None, end_date=None, market=Market.CN):
-        for symbol in DataUtilFromTushare.load_basic()['symbol']:
-            df = ts_pro.adj_factor(ts_code=symbol, trade_date='')
+    def load_adj_factors(symbols=None, start_date=None, end_date=''):
+        df = DataUtilFromTushare.query('adj_factor', ts_code=symbols, start_date=start_date, end_date=end_date)
+        mask = df['adj_factor'].pct_change() != 0.0
+        df = df.loc[mask]
+        df.rename({'ts_code': 'symbol', 'trade_date': 'timestamp'}, inplace=True, axis=1)
+        return df
 
 
 if __name__ == '__main__':
@@ -126,3 +110,6 @@ if __name__ == '__main__':
     print(quote)
     calendar = ts_pro.trade_cal(start_date='20100101', end_date='20210101', is_open=1)['cal_date'].to_list()
     print(calendar[::-1])
+    df = ts_pro.adj_factor(ts_code='000001.SZ', trade_date='')
+    print(df)
+
