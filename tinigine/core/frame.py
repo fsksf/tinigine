@@ -7,6 +7,7 @@
 import numpy as np
 import pandas as pd
 
+from .calender import Calender
 
 class Frame:
 
@@ -16,7 +17,7 @@ class Frame:
 
     def __init__(self, arr, index, name, columns):
         self._arr = arr
-        self._index = index
+        self._index = Calender(None, index)
         self._name = name
         self._columns = columns
 
@@ -37,7 +38,7 @@ class Frame:
         return self._arr
 
     def to_dataframe(self):
-        data = pd.DataFrame(self.arr, index=self.index, columns=self.columns)
+        data = pd.DataFrame(self.arr, index=self.index.cal_list, columns=self.columns)
         return data
 
     def append(self, other):
@@ -57,7 +58,7 @@ class SFrame:
 
     def __init__(self, frame_dict=None):
         self.frame_dict = frame_dict if frame_dict else {}
-        self.index = None
+        self.index: Calender = None
         self.columns = None
 
     def append(self, other):
@@ -95,7 +96,7 @@ class SFrame:
             return pd.DataFrame()
         out = SFrame()
         for field_name, frame in self.frame_dict.items():
-            out.add(Frame(arr=frame.arr[start_id: end_id], index=frame.index[start_id: end_id], columns=frame.columns,
+            out.add(Frame(arr=frame.arr[start_id: end_id], index=frame.index.cal_list[start_id: end_id], columns=frame.columns,
                           name=field_name))
         return out
 
@@ -122,22 +123,21 @@ class SFrame:
         if len(self.index) == 0:
             raise ValueError
         if side == 'gte':
-            if o > self.index[-1]:
+            if o > self.index.o_of(-1):
                 raise ValueError(f'{o} is grate than index max')
-            for i, item in list(enumerate(self.index))[::-1]:
-                if item < o:
-                    return i+1
-                elif item == o:
-                    return i
-
+            try:
+                return self.index.i_of(o)
+            except KeyError:
+                o += 1
+                return self.i_of(o, side)
         elif side == 'lte':
-            if o < self.index[0]:
-                raise ValueError(f'{o} is lt than index min')
-            for i, item in list(enumerate(self.index))[::-1]:
-                if item > o:
-                    return i-1
-                elif item == 0:
-                    return i
+            if o < self.index.o_of(0):
+                raise ValueError(f'{o} is grate than index max')
+            try:
+                return self.index.i_of(o)
+            except KeyError:
+                o -= 1
+                return self.i_of(o, side)
         return None
 
     def __len__(self):
