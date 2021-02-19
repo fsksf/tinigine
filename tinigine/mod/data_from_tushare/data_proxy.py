@@ -8,6 +8,7 @@ from abc import ABC
 import datetime
 import sqlalchemy.exc as sqlexc
 from tinigine.utils.db import DBConnect, DBUtil
+from tinigine.core.event import EventType, Event
 from tinigine.utils.datetime_utils import day_count
 
 from tinigine.interface import AbstractDataProxy
@@ -60,6 +61,19 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
     def get_symbols(self):
         symbols_info_list = self.get_contract_info(symbols=None, market=str(self._env.params.market.name))
         return [d.symbol for d in symbols_info_list]
+
+    def on_subscribe(self, event):
+        symbols = event.symbols
+        start = self._env.params.start
+        end = self._env.params.end
+        start = self
+        DBUtil.select([QuoteDaily], filter_list=(QuoteDaily.symbol.in_(symbols), QuoteDaily.timestamp >= ))
+        self._cache = sf
+        return sf
+
+    def subscribe(self, symbols, before_bar_count=1):
+        evt = Event(event_type=EventType.SUBSCRIBE, symbols=symbols, before_bar_count=before_bar_count)
+        self._env.event_bus.emit(event=evt)
 
     def dft_data_update(self):
         """
