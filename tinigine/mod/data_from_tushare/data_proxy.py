@@ -159,7 +159,7 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         self._env.logger.info(f'download adj factors from {start} to {end} with symbols count {total}, step: {step_len}')
         for i in range(0, total, step_len):
             symbol = symbols[i:i+step_len]
-            self._env.logger.info(f'download adj factors from tushare, progress: {i}/{fetch_count}')
+            self._env.logger.info(f'download adj factors from tushare, progress: {i}/{total}')
             data = DataUtilFromTushare.load_adj_factors(symbols=symbol, start_date=start, end_date=end)
             data = data.to_dict(orient='records')
             DBUtil.upsert(QuoteAdjFactors, data, unique=[QuoteAdjFactors.symbol, QuoteAdjFactors.timestamp])
