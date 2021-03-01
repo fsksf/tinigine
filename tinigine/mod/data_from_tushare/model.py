@@ -4,10 +4,10 @@
 @since: 2021/2/1 10:12 PM
 """
 from sqlalchemy import Column, FLOAT, INT, VARCHAR, DATE, Index, BigInteger
-from tinigine.utils.db import Base
+from tinigine.utils.db import Base, ModelMixin
 
 
-class StockBasic(Base):
+class StockBasic(Base, ModelMixin):
     """
     股票标的信息表
     """
@@ -31,7 +31,7 @@ class StockBasic(Base):
 Index("stock_basic_symbol_ix", StockBasic.symbol, unique=True)
 
 
-class QuoteDaily(Base):
+class QuoteDaily(Base, ModelMixin):
     """日线行情"""
     __tablename__ = 'stock_quote_daily'
     id = Column(type_=BigInteger, primary_key=True)
@@ -47,7 +47,7 @@ class QuoteDaily(Base):
 Index('stock_quote_daily_symbol_timestamp_ix', QuoteDaily.symbol, QuoteDaily.timestamp, unique=True)
 
 
-class QuoteAdjFactors(Base):
+class QuoteAdjFactors(Base, ModelMixin):
     """复权因子"""
     __tablename__ = 'stock_adj_factor'
     id = Column(type_=BigInteger, primary_key=True)
@@ -59,7 +59,7 @@ class QuoteAdjFactors(Base):
 Index('stock_adj_factor_symbol_timestamp_ix', QuoteAdjFactors.symbol, QuoteAdjFactors.timestamp, unique=True)
 
 
-class DailyTradeCalender(Base):
+class DailyTradeCalender(Base, ModelMixin):
     """日线日历，会提前一整年"""
     __tablename__ = 'daily_trade_calender'
     id = Column(type_=BigInteger, primary_key=True)
