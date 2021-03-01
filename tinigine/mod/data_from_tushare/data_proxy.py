@@ -7,9 +7,11 @@
 from abc import ABC
 import datetime
 import sqlalchemy.exc as sqlexc
+import pandas as pd
 from tinigine.utils.db import DBConnect, DBUtil
 from tinigine.core.event import EventType, Event
 from tinigine.utils.datetime_utils import day_count
+from tinigine.core.frame import Frame, SFrame
 
 from tinigine.interface import AbstractDataProxy
 from .model import DailyTradeCalender, StockBasic, QuoteDaily, QuoteAdjFactors
@@ -20,9 +22,11 @@ from tinigine.mod.data_from_tushare import mod_conf
 class MysqlDataProxy(AbstractDataProxy, ABC):
     def __init__(self, env):
         super(MysqlDataProxy, self).__init__(env)
+        # 订阅行情function 关联 订阅 事件
+        self._env.event_bus.on(EventType.SUBSCRIBE)(self.on_subscribe)
 
     def get_sf(self):
-        pass
+        return self._cache
 
     def get_calendar(self, start=None, end=None):
         with DBConnect() as s:
@@ -66,12 +70,36 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         symbols = event.symbols
         start = self._env.params.start
         end = self._env.params.end
-        start = self
-        DBUtil.select([QuoteDaily], filter_list=(QuoteDaily.symbol.in_(symbols), QuoteDaily.timestamp >= ))
+        filter_list = [QuoteDaily.symbol.in_(symbols), QuoteDaily.timestamp >= start]
+        cal_filter_list = [DailyTradeCalender.timestamp >= start]
+        factor_filter_list = [QuoteAdjFactors.symbol.in_(symbols), QuoteAdjFactors.timestamp >= start]
+        if end:
+            filter_list.append(QuoteDaily.timestamp <= end)
+            factor_filter_list.append(QuoteAdjFactors.timestamp <= end)
+            cal_filter_list.append(DailyTradeCalender.timestamp <= end)
+        cal_list = DBUtil.select([DailyTradeCalender.timestamp], filter_list=cal_filter_list)
+        cal_list = pd.DataFrame(cal_list)['timestamp'].sort_values().to_list()
+        daily = DBUtil.select([QuoteDaily], filter_list=filter_list)
+        quote_no_br = pd.DataFrame(data=daily)
+        factor = DBUtil.select([QuoteAdjFactors], filter_list=factor_filter_list)
+        factor_df = pd.DataFrame(factor)
+        quote_no_br.set_index(['timestamp', 'symbol'], inplace=True)
+        factor_df.set_index(['timestamp', 'symbol'], inplace=True)
+        factor_df = factor_df['adj_factor'].unstack().sort_index().fillna(method='pad')
+        factor_df = factor_df.reindex(cal_list).reindex(symbols, axis=1)
+        sf = SFrame()
+        for field in quote_no_br.columns:
+            field_df = quote_no_br[field].unstack().reindex(cal_list)
+            field_df = field_df.reindex(symbols, axis=1)
+
+            fr = Frame(arr=field_df.to_numpy(), index=cal_list, columns=symbols)
+            sf.add(fr)
         self._cache = sf
         return sf
 
     def subscribe(self, symbols, before_bar_count=1):
+        if isinstance(symbols, str):
+            symbols = [symbols, ]
         evt = Event(event_type=EventType.SUBSCRIBE, symbols=symbols, before_bar_count=before_bar_count)
         self._env.event_bus.emit(event=evt)
 

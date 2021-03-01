@@ -15,4 +15,5 @@ def mock_env():
     p_config = conf.get_config()['params']
     params = Params(**p_config)
     env = Environment(params)
-    Engine(env).load_mod()
+    engine_instance = Engine(env)
+    return engine_instance
