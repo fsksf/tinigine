@@ -92,7 +92,7 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
             field_df = quote_no_br[field].unstack().reindex(cal_list)
             field_df = field_df.reindex(symbols, axis=1)
 
-            fr = Frame(arr=field_df.to_numpy(), index=cal_list, columns=symbols)
+            fr = Frame(arr=field_df.to_numpy(), index=cal_list, columns=symbols, name=field)
             sf.add(fr)
         self._cache = sf
         return sf
