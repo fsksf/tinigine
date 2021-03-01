@@ -6,8 +6,10 @@
 """
 import sqlalchemy.exc as sqlexc
 from sqlalchemy.ext.declarative import declarative_base, AbstractConcreteBase
+from sqlalchemy.ext.declarative.api import DeclarativeMeta
 from sqlalchemy import create_engine, desc, and_
 from sqlalchemy.orm import sessionmaker
+
 
 from tinigine.config import conf
 SQLALCHEMY_DATABASE_URI = conf.get_config()['db']['main']
@@ -15,6 +17,14 @@ SQLALCHEMY_DATABASE_URI = conf.get_config()['db']['main']
 
 db = create_engine(SQLALCHEMY_DATABASE_URI)
 DBSession = sessionmaker(bind=db)
+
+
+class ModelMixin:
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
 Base = declarative_base()
 
 
@@ -33,9 +43,18 @@ class DBConnect:
 class DBUtil:
 
     @staticmethod
-    def select(query_list: list, filter_list: list):
+    def select(query_list: list, filter_list: list, obj_type='dict'):
         with DBConnect() as s:
-            data = s.query(*query_list).fliter(*filter_list).all()
+            data = s.query(*query_list).filter(*filter_list).all()
+            if obj_type == 'dict':
+                if data and isinstance(data[0], Base):
+                    data = [d.to_dict() for d in data]
+                elif data:
+                    fields = [qf.name for qf in query_list]
+                    data = [dict(tuple(zip(fields, d))) for d in data]
+            elif obj_type == 'tuple':
+                if data and isinstance(data[0], Base):
+                    data = [tuple(d.to_dict().values) for d in data]
             return data
 
     @staticmethod

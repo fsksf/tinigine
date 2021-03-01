@@ -6,10 +6,15 @@
 """
 from abc import ABC
 import datetime
+import sqlalchemy.exc as sqlexc
+import pandas as pd
 from tinigine.utils.db import DBConnect, DBUtil
+from tinigine.core.event import EventType, Event
+from tinigine.utils.datetime_utils import day_count
+from tinigine.core.frame import Frame, SFrame
 
 from tinigine.interface import AbstractDataProxy
-from .model import DailyTradeCalender, StockBasic, QuoteDaily
+from .model import DailyTradeCalender, StockBasic, QuoteDaily, QuoteAdjFactors
 from .downloader import DataUtilFromTushare
 from tinigine.mod.data_from_tushare import mod_conf
 
@@ -17,9 +22,11 @@ from tinigine.mod.data_from_tushare import mod_conf
 class MysqlDataProxy(AbstractDataProxy, ABC):
     def __init__(self, env):
         super(MysqlDataProxy, self).__init__(env)
+        # 订阅行情function 关联 订阅 事件
+        self._env.event_bus.on(EventType.SUBSCRIBE)(self.on_subscribe)
 
     def get_sf(self):
-        pass
+        return self._cache
 
     def get_calendar(self, start=None, end=None):
         with DBConnect() as s:
@@ -56,8 +63,45 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         return data
 
     def get_symbols(self):
-        symbols_info_list = self.get_contract_info(symbols=None, market=str(self._env.params.market))
+        symbols_info_list = self.get_contract_info(symbols=None, market=str(self._env.params.market.name))
         return [d.symbol for d in symbols_info_list]
+
+    def on_subscribe(self, event):
+        symbols = event.symbols
+        start = self._env.params.start
+        end = self._env.params.end
+        filter_list = [QuoteDaily.symbol.in_(symbols), QuoteDaily.timestamp >= start]
+        cal_filter_list = [DailyTradeCalender.timestamp >= start]
+        factor_filter_list = [QuoteAdjFactors.symbol.in_(symbols), QuoteAdjFactors.timestamp >= start]
+        if end:
+            filter_list.append(QuoteDaily.timestamp <= end)
+            factor_filter_list.append(QuoteAdjFactors.timestamp <= end)
+            cal_filter_list.append(DailyTradeCalender.timestamp <= end)
+        cal_list = DBUtil.select([DailyTradeCalender.timestamp], filter_list=cal_filter_list)
+        cal_list = pd.DataFrame(cal_list)['timestamp'].sort_values().to_list()
+        daily = DBUtil.select([QuoteDaily], filter_list=filter_list)
+        quote_no_br = pd.DataFrame(data=daily)
+        factor = DBUtil.select([QuoteAdjFactors], filter_list=factor_filter_list)
+        factor_df = pd.DataFrame(factor)
+        quote_no_br.set_index(['timestamp', 'symbol'], inplace=True)
+        factor_df.set_index(['timestamp', 'symbol'], inplace=True)
+        factor_df = factor_df['adj_factor'].unstack().sort_index().fillna(method='pad')
+        factor_df = factor_df.reindex(cal_list).reindex(symbols, axis=1)
+        sf = SFrame()
+        for field in quote_no_br.columns:
+            field_df = quote_no_br[field].unstack().reindex(cal_list)
+            field_df = field_df.reindex(symbols, axis=1)
+
+            fr = Frame(arr=field_df.to_numpy(), index=cal_list, columns=symbols, name=field)
+            sf.add(fr)
+        self._cache = sf
+        return sf
+
+    def subscribe(self, symbols, before_bar_count=1):
+        if isinstance(symbols, str):
+            symbols = [symbols, ]
+        evt = Event(event_type=EventType.SUBSCRIBE, symbols=symbols, before_bar_count=before_bar_count)
+        self._env.event_bus.emit(event=evt)
 
     def dft_data_update(self):
         """
@@ -66,6 +110,8 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         symbols = self.download_symbols()
         start, end = self.download_calender()
         self.download_quote(symbols, start, end)
+        # start, end = 20100101, 20210101
+        self.download_factors(symbols, start=start, end=end)
 
     def download_symbols(self):
         new_basic = DataUtilFromTushare.load_basic(self._env.params.market)
@@ -84,8 +130,11 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
             start_date = last_sync_date[-1] - 7
         calendar = DataUtilFromTushare.load_calendar(start_date=start_date, end_date=end_date)
         calendar = [{'market': str(params.market.name), 'timestamp': c} for c in calendar]
-        if calendar:
-            DBUtil.upsert(DailyTradeCalender, calendar, unique=[DailyTradeCalender.market, DailyTradeCalender.timestamp])
+        for cal in calendar:
+            try:
+                DBUtil.insert(DailyTradeCalender, [cal])
+            except sqlexc.IntegrityError:
+                pass
         return start_date, end_date
 
     def download_quote(self, symbols, start, end):
@@ -103,4 +152,14 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
             DBUtil.upsert(QuoteDaily, data, unique=[QuoteDaily.symbol, QuoteDaily.timestamp])
 
     def download_factors(self, symbols, start, end):
-        DataUtilFromTushare.load_basic()
+        total = len(symbols)
+        day_count_len = day_count(start, end)
+        step_len = total // day_count_len
+        fetch_count = total // step_len + 1
+        self._env.logger.info(f'download adj factors from {start} to {end} with symbols count {total}, step: {step_len}')
+        for i in range(0, total, step_len):
+            symbol = symbols[i:i+step_len]
+            self._env.logger.info(f'download adj factors from tushare, progress: {i}/{total}')
+            data = DataUtilFromTushare.load_adj_factors(symbols=symbol, start_date=start, end_date=end)
+            data = data.to_dict(orient='records')
+            DBUtil.upsert(QuoteAdjFactors, data, unique=[QuoteAdjFactors.symbol, QuoteAdjFactors.timestamp])
