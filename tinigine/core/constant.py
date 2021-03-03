@@ -20,6 +20,16 @@ class ContractType(Enum):
     OPT = 'OPT'
 
 
+class OrderType(Enum):
+    LMT = 'LMT'
+    MKT = 'MKT'
+
+
+class OrderSide(Enum):
+    BUY = 'BUY'
+    SELL = 'SELL'
+
+
 class OrderStatus(Enum):
     NEW = 'NEW'                                 # 初始状态
     SUBMITTED = 'SUBMITTED'                     # 已经提交
