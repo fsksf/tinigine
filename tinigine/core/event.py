@@ -23,6 +23,7 @@ class EventType(Enum):
     AFTER_TRADING = 'AFTER_TRADING'
     BAR = 'BAR'
     TICK = 'TICK'
+    ORDER_NEW = 'ORDER_NEW'
     ORDER_CHANGE = 'ORDER_CHANGE'
     USER_EVENT = 'USER_EVENT'
     QUIT = 'QUIT'
