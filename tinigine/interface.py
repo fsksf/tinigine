@@ -106,3 +106,6 @@ class AbstractEnv:
 
     def set_data_proxy(self, data_proxy):
         self.data_proxy = data_proxy
+
+    def set_broker(self, broker):
+        self.broker = broker

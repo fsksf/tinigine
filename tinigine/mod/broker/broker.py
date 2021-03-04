@@ -15,14 +15,15 @@ class Broker:
     def __init__(self, env):
         self._env: AbstractEnv = env
 
-    def order(self, symbol, quantity, limit_price=None, type_=OrderType.MKT):
+    def order(self, symbol, quantity, limit_price=None, order_type=OrderType.MKT):
         if quantity > 0:
             side = OrderSide.BUY
         else:
             side = OrderSide.SELL
             quantity = abs(quantity)
-        order_obj = Order(symbol=symbol, quantity=quantity, side=side,
-                          quantity=quantity, limit_price=limit_price, type)
+        dt = self._env.data_proxy.get_datetime()
+        order_obj = Order(symbol=symbol, quantity=quantity, side=side, order_type=order_type,
+                          quantity=quantity, limit_price=limit_price, order_time=dt)
 
         evt = Event(event_type=EventType.ORDER_NEW, order_obj=order_obj)
         self._env.event_bus.emit(evt)
