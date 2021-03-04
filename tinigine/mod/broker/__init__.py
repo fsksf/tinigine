@@ -6,7 +6,7 @@ mod_conf = ConfigManager(mod_name='mod_stand_broker')
 
 
 def load():
-    from .mod import ModTemplate
+    from .mod import Bro
     mod_instance = ModTemplate()
     return mod_instance
 
