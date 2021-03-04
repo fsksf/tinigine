@@ -68,3 +68,19 @@ class DailyTradeCalender(Base, ModelMixin):
 
 
 Index('daily_trade_calender_market_timestamp_ix', DailyTradeCalender.market, DailyTradeCalender.timestamp, unique=True)
+
+
+class StockDailyIndex(Base, ModelMixin):
+    """指数"""
+    __tablename__ = 'stock_daily_index'
+    id = Column(type_=BigInteger, primary_key=True)
+    market = Column(type_=VARCHAR(10), doc='市场')
+    timestamp = Column(type_=INT, doc='交易日')
+    open = Column(name='open', type_=FLOAT)
+    high = Column(name='high', type_=FLOAT)
+    low = Column(name='low', type_=FLOAT)
+    close = Column(name='close', type_=FLOAT)
+    volume = Column(type_=FLOAT, doc='成交量')
+
+
+Index('daily_index_market_timestamp_ix', StockDailyIndex.market, StockDailyIndex.timestamp, unique=True)
