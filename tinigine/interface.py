@@ -5,6 +5,7 @@
 @since: 2020-04-25 17:12
 """
 from collections import defaultdict
+from tinigine.core.constant import OrderType
 
 
 class AbstractModule:
@@ -58,9 +59,6 @@ class AbstractDataProxy:
 
 class AbstractEventSource:
 
-    def __init__(self, env):
-        self._env = env
-
     def events(self):
         raise NotImplementedError
 
@@ -109,3 +107,32 @@ class AbstractEnv:
 
     def set_broker(self, broker):
         self.broker = broker
+
+
+class AbstractBroker:
+    def get_positions(self):
+        raise NotImplementedError
+
+    def order(self, symbol, quantity, limit_price=None, order_type=OrderType.MKT):
+        raise NotImplementedError
+
+    def order_value(self, symbol, value, limit_price=None, order_type=OrderType.MKT):
+        raise
+
+    def order_percent(self, symbol, percent, limit_price=None, order_type=OrderType.MKT):
+        raise NotImplementedError
+
+    def cancel_order(self, order_id):
+        raise NotImplementedError
+
+    def get_order(self, order_id):
+        raise NotImplementedError
+
+    def get_orders(self):
+        raise NotImplementedError
+
+    def get_open_orders(self):
+        raise NotImplementedError
+
+    def get_portfolio(self):
+        raise NotImplementedError

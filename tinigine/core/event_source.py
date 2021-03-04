@@ -4,26 +4,22 @@
 
 @since: 2020/9/19 11:59 AM
 """
-from tinigine.interface import AbstractEventSource
+from tinigine.interface import AbstractEventSource, AbstractEnv
 from tinigine.core.env import Environment
 from tinigine.core.event import EventType, Event
-from tinigine.core.data_walker import DataWalker
 
 
 class EventSource(AbstractEventSource):
 
-    def __init__(self, env: Environment):
-        super(EventSource, self).__init__(env)
+    def __init__(self, env: AbstractEnv):
+        self._env = env
 
     def events(self):
         return self.data_events()
 
     def data_events(self):
-        env = self._env
-        event_bus = env.event_bus
-        start_date = env.params.start
         yield Event(event_type=EventType.INITIALIZE)
-        for data in DataWalker(env.data_proxy.get_sf(), start_date):
+        for data in self._env.data_proxy.data_walker:
             yield Event(event_type=EventType.BAR, data=data)
 
 

@@ -27,3 +27,6 @@ class Order:
 
     def to_dict(self):
         return self.__dict__
+
+    def set_order_id(self, order_id):
+        self.order_id = order_id
