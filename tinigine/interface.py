@@ -40,6 +40,17 @@ class AbstractDataProxy:
         """
         raise NotImplementedError
 
+    @staticmethod
+    def get_quote(symbols, start, end):
+        raise NotImplementedError
+
+    def get_quote_br(self, symbols, start, end):
+        raise NotImplementedError
+
+    @staticmethod
+    def get_factor(symbols, start, end):
+        raise NotImplementedError
+
     def get_contract_info(self, symbol):
         raise NotImplementedError
 
