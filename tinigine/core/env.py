@@ -25,12 +25,3 @@ class Environment(AbstractEnv):
         self.strategy = Strategy(env=self, algo_text=params.algo_text, log_level=params.log_level)
         self.conf = conf
         self.logger.info(str(params))
-
-    def set_event_source(self, event_source):
-        self.event_source = event_source
-
-    def set_portfolio_manager(self, portfolio_manager):
-        self.portfolio_manager = portfolio_manager
-
-    def set_data_proxy(self, data_proxy):
-        self.data_proxy = data_proxy
