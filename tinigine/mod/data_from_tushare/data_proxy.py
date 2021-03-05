@@ -93,9 +93,9 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         quote_no_br.set_index(['timestamp', 'symbol'], inplace=True)
         del quote_no_br['id']
         factor_df.set_index(['timestamp', 'symbol'], inplace=True)
-        factor_df = factor_df['adj_factor'].unstack().sort_index().fillna(method='pad')
-        factor_df = factor_df.reindex(cal_list).reindex(symbols, method='pad', axis=1)
-        factor_df.fillna(value=1.0, inplace=True)
+        factor_df = factor_df['adj_factor'].unstack()
+        factor_df = factor_df.reindex(cal_list, method='pad').reindex(symbols, axis=1)
+        factor_df.fillna(value=1, inplace=True)
         factor_df = factor_df / factor_df.iloc[-1]
         sf = SFrame()
         for field in quote_no_br.columns:
