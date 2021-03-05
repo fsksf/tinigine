@@ -142,9 +142,9 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         data_from_tushare: 初始化、更新数据
         """
         symbols = self.download_symbols()
-        start, end = self.download_calender()
-        self.download_quote(symbols, start, end)
-        # start, end = 20100101, 20210101
+        # start, end = self.download_calender()
+        # self.download_quote(symbols, start, end)
+        start, end = 20100101, 20210305
         self.download_factors(symbols, start=start, end=end)
 
     def download_symbols(self):
