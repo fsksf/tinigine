@@ -11,6 +11,7 @@ from tinigine.core.env import Environment
 from tinigine.core.event import Event, EventType
 from tinigine.core.event_source import EventSource
 
+
 class Engine:
 
     def __init__(self, env: Environment):
