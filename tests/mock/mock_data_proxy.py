@@ -11,6 +11,7 @@ from tinigine.interface import AbstractDataProxy
 from tinigine.core.contract import StockContract
 from tinigine.core.event import Event, EventType
 from tinigine.core.frame import Frame, SFrame
+from tinigine.core.data_walker import DataWalker
 from tests import TESTS_DIR
 
 
@@ -23,8 +24,7 @@ class MockDataProxy(AbstractDataProxy):
         quote_data = pd.read_csv(self._csv_path)
         self._symbols = list(set(quote_data['symbol']))
         self._calendar = sorted(set(quote_data['timestamp']))
-        self._quote_data = quote_data.set_index(['timestamp', 'symbol'])
-        self._quote_data.sort_index(inplace=True)
+        self._quote_data = quote_data
         # 订阅行情function 关联 订阅 事件
         self._env.event_bus.on(EventType.SUBSCRIBE)(self.on_subscribe)
 
@@ -52,14 +52,22 @@ class MockDataProxy(AbstractDataProxy):
 
     def on_subscribe(self, event):
         symbols = event.symbols
+        print(symbols)
+        start = self._env.params.start
         sf = SFrame()
-        for field in self._quote_data.columns:
-            data = self._quote_data[field]
+        quote_df = self._quote_data[self._quote_data['symbol'].isin(symbols)]
+        quote_df.set_index(['timestamp', 'symbol'], inplace=True)
+        for field in quote_df.columns:
+            data = quote_df[field]
             data = data.unstack()
             fr = Frame(data.to_numpy(), list(data.index), name=field, columns=list(data.columns))
             sf.add(fr)
         self._cache = sf
-        return sf
+        self._data_walker = DataWalker(sf, start)
+
+    @property
+    def data_walker(self):
+        return self._data_walker
 
     def subscribe(self, symbols, before_bar_count=1):
 
