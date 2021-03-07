@@ -72,30 +72,44 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         symbols_info_list = self.get_contract_info(symbols=None, market=str(self._env.params.market.name))
         return [d.symbol for d in symbols_info_list]
 
-    def on_subscribe(self, event):
-        symbols = event.symbols
-        start = self._env.params.start
-        end = self._env.params.end
-        filter_list = [QuoteDaily.symbol.in_(symbols), QuoteDaily.timestamp >= start]
+    @staticmethod
+    def get_calender(start, end):
         cal_filter_list = [DailyTradeCalender.timestamp >= start]
-        factor_filter_list = [QuoteAdjFactors.symbol.in_(symbols), QuoteAdjFactors.timestamp >= start]
         if end:
-            filter_list.append(QuoteDaily.timestamp <= end)
-            factor_filter_list.append(QuoteAdjFactors.timestamp <= end)
             cal_filter_list.append(DailyTradeCalender.timestamp <= end)
         cal_list = DBUtil.select([DailyTradeCalender.timestamp], filter_list=cal_filter_list)
         cal_list = pd.DataFrame(cal_list)['timestamp'].sort_values().to_list()
+        return cal_list
+
+    @staticmethod
+    def get_quote(symbols, start, end):
+        filter_list = [QuoteDaily.symbol.in_(symbols), QuoteDaily.timestamp >= start]
+        if end:
+            filter_list.append(QuoteDaily.timestamp <= end)
         daily = DBUtil.select([QuoteDaily], filter_list=filter_list)
         quote_no_br = pd.DataFrame(data=daily)
+        del quote_no_br['id']
+        return quote_no_br
+
+    @staticmethod
+    def get_factor(symbols, start, end):
+        factor_filter_list = [QuoteAdjFactors.symbol.in_(symbols), QuoteAdjFactors.timestamp >= start]
+        if end:
+            factor_filter_list.append(QuoteAdjFactors.timestamp <= end)
         factor = DBUtil.select([QuoteAdjFactors], filter_list=factor_filter_list)
         factor_df = pd.DataFrame(factor)
         del factor_df['id']
-        quote_no_br.set_index(['timestamp', 'symbol'], inplace=True)
-        del quote_no_br['id']
+        return factor_df
+
+    def get_quote_br(self, symbols, start, end):
+        quote_no_br = self.get_quote(symbols, start, end)
+        factor_df = self.get_factor(symbols, start, end)
+        cal_list = self.get_calendar(start, end)
         factor_df.set_index(['timestamp', 'symbol'], inplace=True)
-        factor_df = factor_df['adj_factor'].unstack().sort_index().fillna(method='pad')
-        factor_df = factor_df.reindex(cal_list).reindex(symbols, method='pad', axis=1)
-        factor_df.fillna(value=1.0, inplace=True)
+        quote_no_br.set_index(['timestamp', 'symbol'], inplace=True)
+        factor_df = factor_df['adj_factor'].unstack()
+        factor_df = factor_df.reindex(cal_list, method='pad').reindex(symbols, axis=1)
+        factor_df.fillna(value=1, inplace=True)
         factor_df = factor_df / factor_df.iloc[-1]
         sf = SFrame()
         for field in quote_no_br.columns:
@@ -107,9 +121,15 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
                 field_df = field_df * factor_df
             fr = Frame(arr=field_df.to_numpy(), index=cal_list, columns=symbols, name=field)
             sf.add(fr)
+        return sf
+
+    def on_subscribe(self, event):
+        symbols = event.symbols
+        start = self._env.params.start
+        end = self._env.params.end
+        sf = self.get_quote_br(symbols, start, end)
         self._cache = sf
         self._data_walker = DataWalker(sf, start)
-        return sf
 
     def subscribe(self, symbols, before_bar_count=1):
         if isinstance(symbols, str):
@@ -124,7 +144,7 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         symbols = self.download_symbols()
         start, end = self.download_calender()
         self.download_quote(symbols, start, end)
-        # start, end = 20100101, 20210101
+        # start, end = 20100101, 20210305
         self.download_factors(symbols, start=start, end=end)
 
     def download_symbols(self):

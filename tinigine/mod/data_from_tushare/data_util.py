@@ -95,9 +95,18 @@ class DataUtilFromTushare:
     @staticmethod
     def load_adj_factors(symbols=None, start_date=None, end_date=''):
         df = DataUtilFromTushare.query('adj_factor', ts_code=symbols, start_date=start_date, end_date=end_date)
-        mask = df['adj_factor'].pct_change(periods=-1) != 0.0
-        df = df.loc[mask]
         df.rename({'ts_code': 'symbol', 'trade_date': 'timestamp'}, inplace=True, axis=1)
+
+        df_list = []
+        for symbol in symbols:
+            symbol_df = df[df['symbol'] == symbol]
+            if symbol_df.empty:
+                continue
+            df.set_index(['timestamp', 'symbol'], inplace=True)
+            mask = symbol_df['adj_factor'].sort_index().pct_change(periods=-1).abs() > 0.000001
+            symbol_df = symbol_df.loc[mask]
+            df_list.append(symbol_df)
+        df = pd.concat(df_list)
         return df
 
 

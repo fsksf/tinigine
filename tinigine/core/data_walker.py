@@ -19,6 +19,14 @@ class DataWalker(Iterable):
     def current(self):
         return self._sf.ix(self._index)
 
+    @property
+    def current_index(self):
+        return self._index
+
+    @current_index.setter
+    def set_current_index(self, value):
+        self._index = value
+
     def history(self, before_bar_count):
         return self._sf.history(start_id=self._index + 1, before_bar_count=before_bar_count)
 
