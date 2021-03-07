@@ -11,6 +11,7 @@ from tinigine.interface import AbstractEnv, AbstractBroker
 from .order_manager import OrderManager
 from .portfolio_manager import PortfolioManager
 
+
 class Broker(AbstractBroker):
 
     def __init__(self, env):
@@ -27,7 +28,7 @@ class Broker(AbstractBroker):
             quantity = abs(quantity)
         dt = self._env.data_proxy.get_datetime()
         order_obj = Order(symbol=symbol, quantity=quantity, side=side, order_type=order_type,
-                          quantity=quantity, limit_price=limit_price, order_time=dt)
+                          limit_price=limit_price, order_time=dt)
 
         evt = Event(event_type=EventType.ORDER_SUBMISSION, order_obj=order_obj)
         self._env.event_bus.emit(evt)

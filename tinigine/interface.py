@@ -67,6 +67,12 @@ class AbstractDataProxy:
     def subscribe(self, symbols, before_bar_count=1):
         raise NotImplementedError
 
+    def current(self):
+        raise NotImplementedError
+
+    def history(self, before_bar_count):
+        raise NotImplementedError
+
 
 class AbstractEventSource:
 

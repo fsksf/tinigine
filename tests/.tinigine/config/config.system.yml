@@ -1,2 +1,2 @@
 
-mod: []
+mod: ["data_from_tushare", "simulation_broker"]

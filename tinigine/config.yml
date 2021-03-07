@@ -3,7 +3,7 @@ params:
   market: "CN"
   start: 20100101
 
-mod: ["data_from_tushare"]
+mod: ["data_from_tushare", "simulation_broker"]
 
 log_level: "INFO"
 

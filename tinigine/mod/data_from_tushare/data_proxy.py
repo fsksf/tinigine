@@ -137,6 +137,12 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         evt = Event(event_type=EventType.SUBSCRIBE, symbols=symbols, before_bar_count=before_bar_count)
         self._env.event_bus.emit(event=evt)
 
+    def current(self):
+        return self.data_walker.current()
+
+    def history(self, before_bar_count):
+        return self.data_walker.history(before_bar_count)
+
     def dft_data_update(self):
         """
         data_from_tushare: 初始化、更新数据

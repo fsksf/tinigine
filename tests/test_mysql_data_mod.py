@@ -34,10 +34,10 @@ class TestEngine:
                         freq='1d',
                         market='CN', currency='CNY')
         environment = Environment(params)
+        engine = Engine(environment)
         environment.set_data_proxy(MockMysqlDataProxy(environment))
         event_source = EventSource(environment)
         environment.set_event_source(event_source)
-        engine = Engine(environment)
         self._env = environment
         self._engine = engine
         self._env.data_proxy.subscribe(['000001.SZ', '600600.SH'], before_bar_count=10)
