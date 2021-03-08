@@ -63,8 +63,12 @@ class TestEngine:
         assert calender[0] == result
 
     def test_subscribe(self):
-        first_data = self._env.data_proxy.data_walker.current()
+        first_data = self._env.data_proxy.current()
         assert first_data['close']['000001.SZ'] == 9.19
+
+    def test_get_datetime(self):
+        dt = self._env.data_proxy.get_datetime()
+        assert dt == 20190102
 
     def test_data_walker(self):
         data_walker = self._env.data_proxy.data_walker

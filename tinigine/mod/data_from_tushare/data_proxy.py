@@ -137,6 +137,9 @@ class MysqlDataProxy(AbstractDataProxy, ABC):
         evt = Event(event_type=EventType.SUBSCRIBE, symbols=symbols, before_bar_count=before_bar_count)
         self._env.event_bus.emit(event=evt)
 
+    def get_datetime(self):
+        return self._data_walker.get_datetime()
+
     def current(self):
         return self.data_walker.current()
 

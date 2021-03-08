@@ -16,6 +16,9 @@ class DataWalker(Iterable):
         self._index = self.get_index(start_time)
         self._end_index = len(self._sf)
 
+    def get_datetime(self):
+        return self._sf.index.o_of(self._index)
+
     def current(self):
         return self._sf.ix(self._index)
 
