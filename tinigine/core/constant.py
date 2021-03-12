@@ -58,3 +58,6 @@ FREQ_FORMAT_DICT = {
     Freq.MINUTE: '%Y-%m-%d %H:%M:%S'
 }
 
+HAND_LIMIT_COUNT = {
+    Market.CN: 100
+}
