@@ -33,6 +33,9 @@ class Broker(AbstractBroker):
         evt = Event(event_type=EventType.ORDER_SUBMISSION, order_obj=order_obj)
         self._env.event_bus.emit(evt)
 
+    def cancel_order(self, order_id):
+        pass
+
     def on_order_submission(self, event: Event):
         order_obj = self._order_manager.add(event.order_obj)
 

@@ -5,9 +5,11 @@
 @since: 2020/9/18 6:07 PM
 """
 import os
+from importlib import import_module
 from errno import EEXIST
 from functools import wraps
 import tinigine.api
+import tinigine.inner_api
 import tinigine.core.event_bus
 from tinigine.utils.local_instance import get_instance
 from tinigine.utils.local_instance import InstanceApiDecorator
@@ -72,3 +74,22 @@ def add_api_method(func):
     setattr(tinigine.api, func.__name__, wrapped)
     wrapped.is_api_method = True
     return wrapped
+
+
+def add_inner_api(func):
+    """
+    添加func到用户环境
+    :param func:
+    :return:
+    """
+    def wrapped(*args, **kwargs):
+        return func(*args, **kwargs)
+
+    tinigine.inner_api.__all__.append(func.__name__)
+    setattr(tinigine.inner_api, func.__name__, wrapped)
+    return wrapped
+
+
+def import_inner_api(name):
+    obj = import_module(name=name, package='tinigine.inner_api')
+    return obj

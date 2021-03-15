@@ -12,7 +12,8 @@ class Order:
 
     def __init__(self, symbol, quantity, side=OrderSide.BUY, order_type=OrderType.MKT,
                  limit_price=None, order_time=None, trade_time=None,
-                 filled_price=None, filled_quantity=0, state=OrderStatus.NEW):
+                 filled_price=None, filled_quantity=0, state=OrderStatus.NEW,
+                 commission=0):
         self.order_id = None
         self.symbol = symbol
         self.quantity = quantity
@@ -24,9 +25,14 @@ class Order:
         self.filled_price = filled_price
         self.filled_quantity = filled_quantity
         self.state = state
+        self.commission = commission
 
     def to_dict(self):
-        return self.__dict__
+        ret = {k: v for k,v in self.__dict__.items() if not str(k).startswith('_')}
+        return ret
 
     def set_order_id(self, order_id):
         self.order_id = order_id
+
+    def add_commission(self, commission):
+        self.commission += commission

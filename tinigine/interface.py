@@ -153,3 +153,11 @@ class AbstractBroker:
 
     def get_portfolio(self):
         raise NotImplementedError
+
+
+class Slippage:
+    def process_order(self, order, filling_price):
+        pass
+
+    def to_dict(self):
+        pass
