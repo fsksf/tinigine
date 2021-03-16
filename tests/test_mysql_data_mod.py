@@ -9,7 +9,7 @@ import pytest
 
 from tinigine.core.engine import Engine
 from tinigine.core.env import Environment
-from tinigine.core.event_source import EventSource
+from tinigine.mod.simulation_broker.event_source import EventSource
 from tinigine.core.params import Params
 from tests.mock.mock_mysql_data_proxy import MockMysqlDataProxy
 

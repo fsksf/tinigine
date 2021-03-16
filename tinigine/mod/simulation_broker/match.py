@@ -30,7 +30,7 @@ class Matcher:
         if reminder % hand_limit_count > 0.0:
             raise ValueError(f'quantity error: {order.to_dict()}')
         current_price = self._env.data_proxy.current()
-        price = current_price['close'][order.symbol]
+        price = current_price['open'][order.symbol]
         hand_max_limit = (current_price['volume'] * mod_conf['trade_max_pct']) // 100 * 100
         if reminder > hand_max_limit:
             reminder = hand_max_limit

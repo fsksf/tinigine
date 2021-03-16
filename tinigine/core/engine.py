@@ -9,7 +9,6 @@ import os
 from importlib import import_module
 from tinigine.core.env import Environment
 from tinigine.core.event import Event, EventType
-from tinigine.core.event_source import EventSource
 
 
 class Engine:
@@ -21,7 +20,6 @@ class Engine:
 
     def initialize(self):
         self.load_mod()
-        self._env.set_event_source(EventSource(self._env))
         self._env.event_bus.emit(Event(EventType.INITIALIZE))
 
     def load_mod(self):

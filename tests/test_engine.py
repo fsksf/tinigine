@@ -5,12 +5,9 @@
 @since: 2020/9/27 9:19 PM
 """
 
-
-import pytest
-
 from tinigine.core.engine import Engine
 from tinigine.core.env import Environment
-from tinigine.core.event_source import EventSource
+from tinigine.mod.simulation_broker.event_source import EventSource
 from tinigine.core.params import Params
 from tests.mock.mock_data_proxy import MockDataProxy
 

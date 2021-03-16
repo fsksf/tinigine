@@ -20,6 +20,7 @@ class Environment(AbstractEnv):
         self.event_bus = EventBus()
         self.portfolio_manager = None
         self.broker = None
+        self.engine = None
         self.metrics = None
         self.logger = get_logger(log_type='system', level=params.log_level)
         self.strategy = Strategy(env=self, algo_text=params.algo_text, log_level=params.log_level)

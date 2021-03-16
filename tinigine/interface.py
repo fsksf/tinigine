@@ -109,6 +109,7 @@ class AbstractEnv:
         self.event_bus: AbstractEventBus = AbstractEventBus()
         self.portfolio_manager = None
         self.broker = None
+        self.engine = None
         self.metrics = None
         self.logger = None
         self.strategy = None
@@ -124,6 +125,10 @@ class AbstractEnv:
 
     def set_broker(self, broker):
         self.broker = broker
+
+    def set_engine(self, engine):
+        self.engine = engine
+
 
 
 class AbstractBroker:
