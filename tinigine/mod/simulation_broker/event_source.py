@@ -22,5 +22,6 @@ class EventSource(AbstractEventSource):
         for data in self._env.data_proxy.data_walker:
             yield Event(event_type=EventType.BEFORE_TRADING, data=data)
             yield Event(event_type=EventType.BAR, data=data)
+            yield Event(event_type=EventType.ORDER_SUBMISSION)
             yield Event(event_type=EventType.SETTLEMENT)
 

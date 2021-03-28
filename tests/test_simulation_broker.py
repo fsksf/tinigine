@@ -50,3 +50,13 @@ class TestSimulationBroker:
         self._env.event_source.data_events()
         orders = self._env.broker.get_orders()
         assert len(orders) == 1
+
+    def test_cancel_order(self):
+        pass
+
+    def test_get_orders(self):
+        pass
+
+    def test_get_positions(self):
+        pass
+

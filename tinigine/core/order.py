@@ -26,6 +26,7 @@ class Order:
         self.filled_quantity = filled_quantity
         self.state = state
         self.commission = commission
+        self.info = None
 
     def to_dict(self):
         ret = {k: v for k,v in self.__dict__.items() if not str(k).startswith('_')}
