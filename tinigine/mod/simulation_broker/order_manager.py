@@ -10,14 +10,14 @@ from tinigine.core.order import Order
 from tinigine.core.constant import OrderStatus
 from tinigine.core.event import EventType, Event
 
+
 class OrderManager:
     def __init__(self, env):
         self._env: AbstractEnv = env
-        self._orders = []
-        self._open_orders = defaultdict(list)
+        self._orders = []                                       # all orders
+        self._open_orders = defaultdict(list)                   # 未完成买卖轮回的浮动盈亏 orders
+        self._pre_bar_orders = []                               # 上个bar下的单，当前bar 成交
 
-        self._env.event_bus.add_event(self.on_order_submission, EventType.ORDER_SUBMISSION)
-        self._env.event_bus.add_event(self.on, EventType.ORDER_SUBMISSION)
         self._env.event_bus.add_event(self.on_order_submission, EventType.ORDER_SUBMISSION)
 
     def add(self, order: Order):
@@ -40,7 +40,7 @@ class OrderManager:
                 self._order_submission_passed(order)
 
     def _order_submission_passed(self, order):
-        self._env.event_bus.emit(Event(EventType.ORDER_SUBMISSION_PASSED, order=order))
+        self._env.event_bus.emit(Event(EventType.ORDER_SUBMISSION_PASSED, order_obj=order))
 
     def on_order_cancellation(self, event):
         order = event.order_obj
@@ -57,3 +57,6 @@ class OrderManager:
 
     def _order_cancel_rejected(self, order):
         self._env.event_bus.emit(Event(EventType.ORDER_CANCELLATION_REJECTED, order=order))
+
+    def _on_order_deal(self, order: Order):
+        pass

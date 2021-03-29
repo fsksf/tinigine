@@ -37,7 +37,8 @@ class Broker(AbstractBroker):
         pass
 
     def on_order_submission(self, event: Event):
-        order_obj = self._order_manager.add(event.order_obj)
+        print(event, event.__dict__)
+        order_obj = self._order_manager.add(getattr(event, 'order_obj'))
 
     def get_order(self, order_id):
         return self._order_manager.get_order(order_id)
@@ -47,3 +48,6 @@ class Broker(AbstractBroker):
 
     def get_orders(self):
         return self._order_manager.get_orders()
+
+    def deal_order(self):
+        pass
