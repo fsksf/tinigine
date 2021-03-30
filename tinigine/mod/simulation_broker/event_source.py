@@ -25,6 +25,5 @@ class EventSource(AbstractEventSource):
             # 完成前一Bar下单--成交
             yield Event(event_type=EventType.ORDER_DEAL)
             # 当前Bar订单提交
-            yield Event(event_type=EventType.ORDER_SUBMISSION)
             yield Event(event_type=EventType.SETTLEMENT)
 

@@ -16,7 +16,7 @@ class Broker(AbstractBroker):
 
     def __init__(self, env):
         self._env: AbstractEnv = env
-        self._env.event_bus.add_event(self.on_order_submission, EventType.ORDER_SUBMISSION)
+        self._env.event_bus.on(EventType.ORDER_SUBMISSION)(self.on_order_submission)
         self._order_manager = OrderManager(self._env)
         self._portfolio_manager = PortfolioManager(self._env)
 

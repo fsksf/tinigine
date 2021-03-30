@@ -18,7 +18,8 @@ class OrderManager:
         self._open_orders = defaultdict(list)                   # 未完成买卖轮回的浮动盈亏 orders
         self._pre_bar_orders = []                               # 上个bar下的单，当前bar 成交
 
-        self._env.event_bus.add_event(self.on_order_submission, EventType.ORDER_SUBMISSION)
+        self._env.event_bus.add_event(self.on_order_submission_passed, EventType.ORDER_SUBMISSION_PASSED)
+        self._env.event_bus.add_event(self.on_order_cancellation, EventType.ORDER_CANCELLATION)
 
     def add(self, order: Order):
         order_id = len(self._orders)
@@ -33,14 +34,11 @@ class OrderManager:
     def get_orders(self):
         return self._orders.copy()
 
-    def on_order_submission(self):
+    def on_order_submission_passed(self):
         for order in self._open_orders:
             if order.state == OrderStatus.NEW:
                 order.state = OrderStatus.SUBMITTED
-                self._order_submission_passed(order)
-
-    def _order_submission_passed(self, order):
-        self._env.event_bus.emit(Event(EventType.ORDER_SUBMISSION_PASSED, order_obj=order))
+                self._env.event_bus.emit(Event(EventType.ORDER_SUBMISSION_PASSED, order_obj=order))
 
     def on_order_cancellation(self, event):
         order = event.order_obj

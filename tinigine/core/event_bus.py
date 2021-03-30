@@ -38,6 +38,7 @@ class EventBus(AbstractEventBus):
 
     def emit(self, event, *args, **kwargs):
         for func in self.get_event_funcs(event.event_type):
+            print('>>>event func>>>', func.__name__)
             func(event, *args, **kwargs)
 
     def emit_after(self, event):
