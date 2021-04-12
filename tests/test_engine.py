@@ -10,7 +10,7 @@ from tests.base import BaseFixtureClass
 
 class TestEngine(BaseFixtureClass):
 
-    def 9test_events(self):
+    def test_events(self):
         self._engine.run()
 
 
