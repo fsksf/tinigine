@@ -15,7 +15,7 @@ class OrderManager:
     def __init__(self, env):
         self._env: AbstractEnv = env
         self._orders = []                                       # all orders
-        self._open_orders = defaultdict(list)                   # 未完成买卖轮回的浮动盈亏 orders
+        self._open_orders = dict()                              # 未完成买卖轮回的浮动盈亏 orders
         self._pre_bar_orders = []                               # 上个bar下的单，当前bar 成交
 
         self._env.event_bus.add_event(self.on_order_submission_passed, EventType.ORDER_SUBMISSION_PASSED)
@@ -35,22 +35,24 @@ class OrderManager:
         return self._orders.copy()
 
     def on_order_submission_passed(self):
-        for order in self._open_orders:
+        for order in self._open_orders.values():
             if order.state == OrderStatus.NEW:
                 order.state = OrderStatus.SUBMITTED
-                self._env.event_bus.emit(Event(EventType.ORDER_SUBMISSION_PASSED, order_obj=order))
+            self._env.broker.on_order_submission()
 
     def on_order_cancellation(self, event):
         order = event.order_obj
         state = order.state
         if state in (OrderStatus.NEW, OrderStatus.SUBMITTED, OrderStatus.PARTIALLY_FILLED):
             order.state = OrderStatus.CANCELLED
+            self._env.broker.cancel_order(order.order_id)
             self._order_cancel_passed(order)
         elif state == OrderStatus.FILLED:
             order.info = 'The current order has been filled, so it cannot be cancelled.'
             self._order_cancel_rejected(order)
 
     def _order_cancel_passed(self, order):
+        self._open_orders[order.symbol].remove(order)
         self._env.event_bus.emit(Event(EventType.ORDER_CANCELLATION_PASSED, order=order))
 
     def _order_cancel_rejected(self, order):
@@ -58,3 +60,6 @@ class OrderManager:
 
     def _on_order_deal(self, order: Order):
         pass
+
+    def clean_open_orders(self):
+        self._open_orders = dict()

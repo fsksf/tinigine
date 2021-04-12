@@ -10,6 +10,7 @@ from tinigine.core.event import Event, EventType
 from tinigine.interface import AbstractEnv, AbstractBroker
 from .order_manager import OrderManager
 from .portfolio_manager import PortfolioManager
+from .match import Matcher
 
 
 class Broker(AbstractBroker):
@@ -19,6 +20,7 @@ class Broker(AbstractBroker):
         self._env.event_bus.on(EventType.ORDER_SUBMISSION)(self.on_order_submission)
         self._order_manager = OrderManager(self._env)
         self._portfolio_manager = PortfolioManager(self._env)
+        self._matcher = Matcher(self._env)
 
     def order(self, symbol, quantity, limit_price=None, order_type=OrderType.MKT):
         if quantity > 0:
@@ -50,4 +52,4 @@ class Broker(AbstractBroker):
         return self._order_manager.get_orders()
 
     def deal_order(self):
-        pass
+        self._matcher.limit_order_cross()

@@ -5,7 +5,7 @@
 @since: 2020/9/18 6:07 PM
 """
 import os
-from importlib import import_module
+from importlib import import_module, reload
 from errno import EEXIST
 from functools import wraps
 import tinigine.api

@@ -21,6 +21,7 @@ class EventSource(AbstractEventSource):
         yield Event(event_type=EventType.INITIALIZE)
         for data in self._env.data_proxy.data_walker:
             yield Event(event_type=EventType.BEFORE_TRADING, data=data)
+            yield Event(event_type=EventType.ORDER_SUBMISSION)
             yield Event(event_type=EventType.BAR, data=data)
             # 完成前一Bar下单--成交
             yield Event(event_type=EventType.ORDER_DEAL)

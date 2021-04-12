@@ -10,8 +10,9 @@ from tinigine.core.commission import CNStockCommission, Commission
 from tinigine.core.constant import HAND_LIMIT_COUNT
 from tinigine.mod.simulation_broker import mod_conf
 from tinigine.utils.utils import import_inner_api
+from .slippage import *
 
-slippage_class_name = mod_conf['FixedBasisPointsSlippage']
+slippage_class_name = mod_conf['slippage_class']
 slippage_class: Slippage = import_inner_api(name=slippage_class_name)
 
 
