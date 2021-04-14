@@ -51,11 +51,13 @@ class Broker(AbstractBroker):
         oder_obj = getattr(evt, 'order_obj')
         order_reason = self._order_manager.on_order_submission(oder_obj)
         flag = order_reason.result
+        # ====================== 下单前验证 =====================
         if flag:
             order_reason = self._portfolio_manager.on_order_submission(oder_obj)
             flag = order_reason.result
+        # ====================== 验证结束 ======================
         if flag:
-            pass
+            self._env.event_bus.emit()
         else:
             self._env.event_bus.emit(Event(event_type=EventType.ORDER_REJECTED, info=order_reason.reason))
 
