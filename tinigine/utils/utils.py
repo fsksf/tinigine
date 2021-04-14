@@ -91,5 +91,6 @@ def add_inner_api(func):
 
 
 def import_inner_api(name):
-    obj = import_module(name=name, package='tinigine.inner_api')
+    module = import_module(name='tinigine.inner_api')
+    obj = getattr(module, name)
     return obj

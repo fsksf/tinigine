@@ -144,7 +144,7 @@ class AbstractBroker:
     def order_percent(self, symbol, percent, limit_price=None, order_type=OrderType.MKT):
         raise NotImplementedError
 
-    def cancel_order(self, order_id):
+    def on_cancel_order(self, order_id):
         raise NotImplementedError
 
     def get_order(self, order_id):
