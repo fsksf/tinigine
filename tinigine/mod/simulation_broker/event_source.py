@@ -20,10 +20,10 @@ class EventSource(AbstractEventSource):
     def data_events(self):
         yield Event(event_type=EventType.INITIALIZE)
         for data in self._env.data_proxy.data_walker:
+            # 每天先完成上个交易日下单的撮合成交
+            yield Event(event_type=EventType.ORDER_DEAL)
             yield Event(event_type=EventType.BEFORE_TRADING, data=data)
             yield Event(event_type=EventType.BAR, data=data)
-            # 完成前一Bar下单--成交
-            yield Event(event_type=EventType.ORDER_DEAL)
             # 当前Bar订单提交
             yield Event(event_type=EventType.SETTLEMENT)
 

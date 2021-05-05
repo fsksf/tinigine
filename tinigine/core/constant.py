@@ -35,6 +35,7 @@ class OrderStatus(Enum):
     SUBMITTED = 'SUBMITTED'                     # 已经提交
     PARTIALLY_FILLED = 'PARTIALLY_FILLED'       # 部分成交
     FILLED = 'FILLED'                           # 全部成交
+    FAIL = 'FAIL'                               # 失败
     PENDING_CANCEL = 'PENDING_CANCEL'           # 待取消
     CANCELLED = 'CANCELLED'                     # 已取消
     REJECTED = 'REJECTED'                       # 已拒绝
