@@ -25,7 +25,7 @@ class OrderManager:
         order_id = len(self._orders)
         order.set_order_id(order_id)
         self._orders.append(order)
-        self._open_orders[order.symbol] = order
+        self._pre_bar_orders.append(order)
         return order
 
     def on_order_submission(self, order_obj):
@@ -39,6 +39,12 @@ class OrderManager:
 
     def get_orders(self):
         return self._orders.copy()
+
+    def get_pre_orders(self):
+        return self._pre_bar_orders.copy()
+
+    def reset_pre_orders(self):
+        self._pre_bar_orders = list()
 
     def on_order_submission_passed(self):
         for order in self._open_orders.values():
@@ -64,7 +70,7 @@ class OrderManager:
     def _order_cancel_rejected(self, order):
         self._env.event_bus.emit(Event(EventType.ORDER_CANCELLATION_REJECTED, order=order))
 
-    def _on_order_deal(self, order: Order):
+    def on_order_deal(self, order):
         pass
 
     def clean_open_orders(self):

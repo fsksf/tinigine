@@ -20,6 +20,7 @@ class Broker(AbstractBroker):
         self._env.event_bus.on(EventType.ORDER_NEW)(self.on_new_order)
         self._env.event_bus.add_event(self.on_order_submission, EventType.ORDER_SUBMISSION)
         self._env.event_bus.add_event(self.on_cancel_order, EventType.ORDER_CANCELLATION)
+        self._env.event_bus.add_event(self.deal_order, EventType.ORDER_DEAL)
         self._order_manager = OrderManager(self._env)
         self._portfolio_manager = PortfolioManager(self._env)
         self._matcher = Matcher(self._env)
@@ -70,5 +71,8 @@ class Broker(AbstractBroker):
     def get_orders(self):
         return self._order_manager.get_orders()
 
-    def deal_order(self):
-        self._matcher.limit_order_cross()
+    def deal_order(self, evt: Event):
+        for order in self._order_manager.get_pre_orders():
+            order = self._matcher.order_cross(order)
+            self._order_manager.on_order_deal(order)
+        self._order_manager.reset_pre_orders()
