@@ -20,6 +20,7 @@ class Engine:
 
     def initialize(self):
         self.load_mod()
+        self._env.strategy.set_up()
         self._env.event_bus.emit(Event(EventType.INITIALIZE))
 
     def load_mod(self):
@@ -68,5 +69,6 @@ class Engine:
 
     def tear_down(self):
         self._env.logger.info('tear down mods')
+        print(self._env.broker.get_orders())
         for mod in self._mod_list:
             mod.tear_down()

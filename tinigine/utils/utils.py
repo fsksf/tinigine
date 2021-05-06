@@ -82,12 +82,9 @@ def add_inner_api(func):
     :param func:
     :return:
     """
-    def wrapped(*args, **kwargs):
-        return func(*args, **kwargs)
-
     tinigine.inner_api.__all__.append(func.__name__)
-    setattr(tinigine.inner_api, func.__name__, wrapped)
-    return wrapped
+    setattr(tinigine.inner_api, func.__name__, func)
+    return func
 
 
 def import_inner_api(name):

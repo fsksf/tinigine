@@ -31,9 +31,12 @@ class Strategy:
 
         self._user_space = dict()
         self.add_api('log', get_logger())
-        self.set_up()
 
     def set_up(self):
+        """
+        策略的初始化应该在所有mod初始化之后
+        :return:
+        """
         add_api_method(self.subscribe)
         self.init_algo()
         self.parse_strategy()

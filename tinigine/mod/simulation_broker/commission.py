@@ -4,6 +4,7 @@
 @github: https://github.com/fsksf 
 @since: 2021/3/6 3:44 PM
 """
+from tinigine.utils.utils import add_inner_api
 
 
 class Commission:
@@ -12,6 +13,7 @@ class Commission:
         raise NotImplementedError
 
 
+@add_inner_api
 class CNStockCommission(Commission):
     TRADE_COMMISSION_PCT = 0.00025
     TRADE_COMMISSION_LEAST = 5
