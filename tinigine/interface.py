@@ -130,7 +130,6 @@ class AbstractEnv:
         self.engine = engine
 
 
-
 class AbstractBroker:
     def get_positions(self):
         raise NotImplementedError
@@ -161,8 +160,10 @@ class AbstractBroker:
 
 
 class Slippage:
-    def process_order(self, order, filling_price):
+    @classmethod
+    def process_order(cls, order, filling_price):
         pass
 
-    def to_dict(self):
+    @classmethod
+    def to_dict(cls):
         pass

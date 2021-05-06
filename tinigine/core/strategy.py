@@ -34,7 +34,7 @@ class Strategy:
 
     def set_up(self):
         """
-        策略的初始化应该在所有mod初始化之后
+        策略的初始化应该在所有mod初始化之后, 确保所有的依赖都加载完毕
         :return:
         """
         add_api_method(self.subscribe)

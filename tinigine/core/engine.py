@@ -69,6 +69,5 @@ class Engine:
 
     def tear_down(self):
         self._env.logger.info('tear down mods')
-        print(self._env.broker.get_orders())
         for mod in self._mod_list:
             mod.tear_down()
