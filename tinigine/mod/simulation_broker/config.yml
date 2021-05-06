@@ -7,3 +7,4 @@ commission_min: 5                 # 交易最低佣金
 trade_max_pct: 0.1                # 最多成交占当天成交量百分比
 
 slippage_class: "FixedBasisPointsSlippage"
+commission_class: "CNStockCommission"

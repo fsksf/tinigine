@@ -11,12 +11,15 @@ from tinigine.interface import AbstractEnv, AbstractBroker
 from .order_manager import OrderManager
 from .portfolio_manager import PortfolioManager
 from .match import Matcher
+from tinigine.utils.utils import add_api_method
 
 
 class Broker(AbstractBroker):
 
     def __init__(self, env):
         self._env: AbstractEnv = env
+        add_api_method(self.order)
+        add_api_method(self.order_percent)
         self._env.event_bus.on(EventType.ORDER_NEW)(self.on_new_order)
         self._env.event_bus.add_event(self.on_order_submission, EventType.ORDER_SUBMISSION)
         self._env.event_bus.add_event(self.on_cancel_order, EventType.ORDER_CANCELLATION)
@@ -37,6 +40,9 @@ class Broker(AbstractBroker):
 
         evt = Event(event_type=EventType.ORDER_NEW, order_obj=order_obj)
         self._env.event_bus.emit(evt)
+
+    def order_percent(self, symbol, percent, limit_price=None, order_type=OrderType.MKT):
+        pass
 
     def on_cancel_order(self, evt: Event):
         pass

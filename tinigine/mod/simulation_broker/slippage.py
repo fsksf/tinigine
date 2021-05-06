@@ -28,17 +28,17 @@ class FixedSlippage(Slippage):
 
 @add_inner_api
 class FixedBasisPointsSlippage(Slippage):
-    def __init__(self, basis_points=0.0, volume_limit=1.0):
-        self.basis_points = basis_points
-        self.volume_limit = volume_limit
+    basis_points = 0
+    volume_limit = 0.1
 
-    def process_order(self, order: Order, filling_price):
-        gap = filling_price * self.basis_points
+    @classmethod
+    def process_order(cls, order: Order, filling_price):
+        gap = filling_price * cls.basis_points
         if order.side == OrderSide.BUY:
-            order.filled_price += gap
+            order.filled_price = filling_price + gap
         else:
-            order.filled_price -= gap
-        # order.realized_pnl -= gap * order.filled
+            order.filled_price = filling_price - gap
 
-    def to_dict(self):
-        return {'type': 'fixbasis', 'basis_points': self.basis_points, 'volume_limit': self.volume_limit}
+    @classmethod
+    def to_dict(cls):
+        return {'type': 'fixbasis', 'basis_points': cls.basis_points, 'volume_limit': cls.volume_limit}
